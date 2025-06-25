@@ -1,6 +1,7 @@
 lastupdate.tmp
 .vscode/
 main
+paz_y_salvos_crud
 swagger.zip
 .scannerwork/
 swagger/*.png
@@ -14,6 +15,7 @@ swagger/images/
 swagger/lang/
 swagger/lib/
 *.env
-resoluciones_crud_v2
 *.exe*
 .exe~
+go.mod
+go.sum
