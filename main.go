@@ -18,7 +18,7 @@ import (
 func main() {
 	connStr, username, password, err := utils.InitDB()
 	if err != nil {
-		logs.Critical(err.Error())
+		logs.Critical("Error: %v", err)
 		os.Exit(1)
 	}
 
@@ -26,11 +26,12 @@ func main() {
 	_ = beego.AppConfig.Set("PGpass", password)
 
 	if err := orm.RegisterDataBase("default", "postgres", connStr); err != nil {
-		logs.Critical("Error configuring database in ORM: %v", err)
+		logs.Critical("Failed to register the database with ORM: %v", err)
 		os.Exit(1)
 	}
+	logs.Info("Database registered successfully with ORM")
 
-	// Configuración CORS
+	// CORS y configuraciones de entorno
 	AllowedOrigins := []string{"*.udistrital.edu.co"}
 	if beego.BConfig.RunMode == "dev" {
 		AllowedOrigins = []string{"*"}
