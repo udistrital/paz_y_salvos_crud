@@ -214,9 +214,6 @@
                     "type": "number",
                     "format": "double"
                 },
-                "EstadoEstudiante": {
-                    "type": "string"
-                },
                 "FechaCreacion": {
                     "type": "string",
                     "format": "datetime"
@@ -251,7 +248,7 @@
                 "Laboratorios": {
                     "type": "boolean"
                 },
-                "NombreEstudiante": {
+                "Observacion": {
                     "type": "string"
                 },
                 "Orc": {
