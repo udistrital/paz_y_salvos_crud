@@ -158,6 +158,16 @@ func UpdateSemaforoById(m *Semaforo) (err error) {
 	return
 }
 
+func PatchSemaforo(id int, params map[string]interface{}) error {
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Semaforo))
+	// Filter por id y aplicar sólo los parámestros pasados
+	if _, err := qs.Filter("id", id).Update(params); err != nil {
+		return err
+	}
+	return nil
+}
+
 // DeleteSemaforo deletes Semaforo by Id and returns error if
 // the record to be deleted doesn't exist
 func DeleteSemaforo(id int) (err error) {

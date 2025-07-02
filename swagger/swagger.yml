@@ -125,7 +125,34 @@ paths:
           description: '{string} delete success!'
         "403":
           description: id is empty
+    patch:
+      tags:
+      - semaforo
+      description: update partial fields of Semaforo
+      operationId: SemaforoController.Patch
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to patch
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: Fields to update
+        required: true
+        schema:
+          $ref: '#/definitions/map[string]interface{}'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Semaforo'
+        "400":
+          description: ': invalid data or parameter'
 definitions:
+  map[string]interface{}:
+    title: map[string]interface{}
+    type: object
   models.Semaforo:
     title: Semaforo
     type: object
