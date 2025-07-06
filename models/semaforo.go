@@ -12,24 +12,24 @@ import (
 
 type Semaforo struct {
 	Id                int       `orm:"column(id);pk;auto"`
-	CodigoEstudiante  float64   `orm:"column(codigo_estudiante)"`
-	IdFacultadOikos   int16     `orm:"column(id_facultad_oikos)"`
-	IdProyectoOikos   int16     `orm:"column(id_proyecto_oikos)"`
-	IdFacultadGedep   int16     `orm:"column(id_facultad_gedep)"`
-	IdProyectoAccra   int16     `orm:"column(id_proyecto_accra)"`
-	AnioInsGrado      float64   `orm:"column(anio_ins_grado)"`
-	PerInsGrado       float64   `orm:"column(per_ins_grado)"`
-	Academico         bool      `orm:"column(academico)"`
-	Financiero        bool      `orm:"column(financiero)"`
-	Biblioteca        bool      `orm:"column(biblioteca)"`
-	Laboratorios      bool      `orm:"column(laboratorios)"`
-	Bienestar         bool      `orm:"column(bienestar)"`
-	Urelinter         bool      `orm:"column(urelinter)"`
-	Orc               bool      `orm:"column(orc)"`
-	Observacion       string    `orm:"column(observacion)"`
-	Activo            bool      `orm:"column(activo)"`
-	FechaCreacion     time.Time `orm:"column(fecha_creacion);type(timestamp without time zone)"`
-	FechaModificacion time.Time `orm:"column(fecha_modificacion);type(timestamp without time zone)"`
+	CodigoEstudiante  float64   `orm:"column(codigo_estudiante);null"`
+	IdFacultadOikos   int16     `orm:"column(id_facultad_oikos);null"`
+	IdProyectoOikos   int16     `orm:"column(id_proyecto_oikos);null"`
+	IdFacultadGedep   int16     `orm:"column(id_facultad_gedep);null"`
+	IdProyectoAccra   int16     `orm:"column(id_proyecto_accra);null"`
+	AnioInsGrado      float64   `orm:"column(anio_ins_grado);null"`
+	PerInsGrado       float64   `orm:"column(per_ins_grado);null"`
+	Academico         bool      `orm:"column(academico);null"`
+	Financiero        bool      `orm:"column(financiero);null"`
+	Biblioteca        bool      `orm:"column(biblioteca);null"`
+	Laboratorios      bool      `orm:"column(laboratorios);null"`
+	Bienestar         bool      `orm:"column(bienestar);null"`
+	Urelinter         bool      `orm:"column(urelinter);null"`
+	Orc               bool      `orm:"column(orc);null"`
+	Observacion       string    `orm:"column(observacion);null"`
+	Activo            bool      `orm:"column(activo);null"`
+	FechaCreacion     time.Time `orm:"auto_now_add;column(fecha_creacion);type(timestamp without time zone)"`
+	FechaModificacion time.Time `orm:"auto_now;column(fecha_modificacion);type(timestamp without time zone)"`
 }
 
 func (t *Semaforo) TableName() string {
@@ -145,23 +145,18 @@ func GetAllSemaforo(query map[string]string, fields []string, sortby []string, o
 
 // UpdateSemaforo updates Semaforo by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateSemaforoById(m *Semaforo) (err error) {
-	o := orm.NewOrm()
-	v := Semaforo{Id: m.Id}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
-		}
-	}
-	return
-}
-
-func PatchSemaforo(id int, params map[string]interface{}) error {
+func UpdateSemaforoById(id int, params map[string]interface{}) error {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Semaforo))
-	// Filter por id y aplicar sólo los parámestros pasados
+	// Check if the record exists
+	count, err := qs.Filter("id", id).Count()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return errors.New("Semaforo not found")
+	}
+	// Update only the provided fields
 	if _, err := qs.Filter("id", id).Update(params); err != nil {
 		return err
 	}
