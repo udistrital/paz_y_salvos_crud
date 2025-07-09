@@ -145,22 +145,17 @@ func GetAllSemaforo(query map[string]string, fields []string, sortby []string, o
 
 // UpdateSemaforo updates Semaforo by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateSemaforoById(id int, params map[string]interface{}) error {
+func UpdateSemaforoById(m *Semaforo) (err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Semaforo))
-	// Check if the record exists
-	count, err := qs.Filter("id", id).Count()
-	if err != nil {
-		return err
+	v := Semaforo{Id: m.Id}
+	// ascertain id exists in the database
+	if err = o.Read(&v); err == nil {
+		var num int64
+		if num, err = o.Update(m); err == nil {
+			fmt.Println("Number of records updated in database:", num)
+		}
 	}
-	if count == 0 {
-		return errors.New("Semaforo not found")
-	}
-	// Update only the provided fields
-	if _, err := qs.Filter("id", id).Update(params); err != nil {
-		return err
-	}
-	return nil
+	return
 }
 
 // DeleteSemaforo deletes Semaforo by Id and returns error if
@@ -176,4 +171,14 @@ func DeleteSemaforo(id int) (err error) {
 		}
 	}
 	return
+}
+
+func PatchSemaforo(id int, params map[string]interface{}) error {
+	o := orm.NewOrm()
+	qs := o.QueryTable(new(Semaforo))
+	// Filter por id y aplicar sólo los parámestros pasados
+	if _, err := qs.Filter("id", id).Update(params); err != nil {
+		return err
+	}
+	return nil
 }

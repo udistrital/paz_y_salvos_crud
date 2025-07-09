@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/udistrital/paz_y_salvos_crud/models"
-	"github.com/udistrital/utils_oas/time_bogota"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -170,26 +168,34 @@ func (c *SemaforoController) Put() {
 		return
 	}
 
-	var fields map[string]interface{}
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &fields); err != nil {
+	var v models.Semaforo
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
+		logs.Error(err)
+		c.Data["mesaage"] = "Error service Put: The request contains an incorrect data type or an invalid parameter"
+		c.Abort("400")
+		return
+	}
+	v.Id = id // Asegura que el id es el correcto
+
+	if err := models.UpdateSemaforoById(&v); err != nil {
 		logs.Error(err)
 		c.Data["mesaage"] = "Error service Put: The request contains an incorrect data type or an invalid parameter"
 		c.Abort("400")
 		return
 	}
 
-	ts := time_bogota.TiempoBogotaFormato()
-	loc, _ := time.LoadLocation("America/Bogota")
-	parsed, _ := time.ParseInLocation(time.RFC3339Nano, ts, loc)
-	fields["fecha_modificacion"] = parsed
-
-	if err := models.UpdateSemaforoById(id, fields); err == nil {
-		updated, _ := models.GetSemaforoById(id)
-		c.Data["json"] = map[string]interface{}{"Success": true, "Status": "200", "Message": "Update successful", "Data": updated}
-	} else {
+	// Consulta el registro actualizado para obtener los valores reales de la BD
+	updated, err := models.GetSemaforoById(id)
+	if err != nil {
 		logs.Error(err)
-		c.Data["mesaage"] = "Error service Put: The request contains an incorrect data type or an invalid parameter"
-		c.Abort("400")
+		c.Abort("404")
+		return
+	}
+	c.Data["json"] = map[string]interface{}{
+		"Success": true,
+		"Status":  "200",
+		"Message": "Update successful",
+		"Data":    updated,
 	}
 	c.ServeJSON()
 }
@@ -211,6 +217,45 @@ func (c *SemaforoController) Delete() {
 		logs.Error(err)
 		c.Data["mesaage"] = "Error service Delete: Request contains incorrect parameter"
 		c.Abort("404")
+	}
+	c.ServeJSON()
+}
+
+// Patch ...
+// @Title Patch
+// @Description update partial fields of Semaforo
+// @Param   id      path    string                 true        "The id you want to patch"
+// @Param   body    body    map[string]interface{} true        "Fields to update"
+// @Success 200 {object} models.Semaforo
+// @Failure 400 : invalid data or parameter
+// @router /:id [patch]
+func (c *SemaforoController) Patch() {
+	idStr := c.Ctx.Input.Param(":id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		logs.Error(err)
+		c.Abort("400")
+	}
+
+	var fields map[string]interface{}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &fields); err != nil {
+		logs.Error(err)
+		c.Abort("400")
+	}
+
+	if err := models.PatchSemaforo(id, fields); err != nil {
+		logs.Error(err)
+		c.Data["mesaage"] = "Error service Patch: datos inválidos o parámetro incorrecto"
+		c.Abort("400")
+	}
+
+	updated, err := models.GetSemaforoById(id)
+	if err != nil {
+		logs.Error(err)
+		c.Abort("404")
+	}
+	c.Data["json"] = map[string]interface{}{
+		"Success": true, "Status": "200", "Message": "Patch successful", "Data": updated,
 	}
 	c.ServeJSON()
 }
