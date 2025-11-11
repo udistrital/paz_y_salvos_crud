@@ -44,15 +44,12 @@ steps:
       - push
 
 - name: run_sonar_scanner
-  image: sonarsource/sonar-scanner-cli:latest
-  environment:
-    SONAR_HOST_URL:
+  image: aosapps/drone-sonar-plugin
+  settings:
+    sonar_host:
       from_secret: SONAR_HOST
-    SONAR_TOKEN:
+    sonar_token:
       from_secret: SONAR_TOKEN
-    SONAR_SCANNER_OPTS: "-Dsonar.working.directory=/tmp/.scannerwork"
-  commands:
-    - sonar-scanner
   when:
     branch:
     - develop
@@ -60,6 +57,24 @@ steps:
     - release/*
     event:
     - push
+
+# - name: run_sonar_scanner
+#   image: sonarsource/sonar-scanner-cli:latest
+#   environment:
+#     SONAR_HOST_URL:
+#       from_secret: SONAR_HOST
+#     SONAR_TOKEN:
+#       from_secret: SONAR_TOKEN
+#     SONAR_SCANNER_OPTS: "-Dsonar.working.directory=/tmp/.scannerwork"
+#   commands:
+#     - sonar-scanner
+#   when:
+#     branch:
+#     - develop
+#     - feature/*
+#     - release/*
+#     event:
+#     - push
 
 - name: publish_to_ecr_release
   image: plugins/ecr
