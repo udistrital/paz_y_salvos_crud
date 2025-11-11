@@ -50,13 +50,6 @@ steps:
       from_secret: SONAR_HOST
     sonar_token:
       from_secret: SONAR_TOKEN
-  when:
-    branch:
-    - develop
-    - feature/*
-    - release/*
-    event:
-    - push
 
 # - name: run_sonar_scanner
 #   image: sonarsource/sonar-scanner-cli:latest
