@@ -2,11 +2,11 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
@@ -152,7 +152,7 @@ func UpdateSemaforoById(m *Semaforo) (err error) {
 	if err = o.Read(&v); err == nil {
 		var num int64
 		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
+			logs.Info("Number of records updated in database:", num)
 		}
 	}
 	return
@@ -167,7 +167,7 @@ func DeleteSemaforo(id int) (err error) {
 	if err = o.Read(&v); err == nil {
 		var num int64
 		if num, err = o.Delete(&Semaforo{Id: id}); err == nil {
-			fmt.Println("Number of records deleted in database:", num)
+			logs.Info("Number of records deleted in database:", num)
 		}
 	}
 	return
