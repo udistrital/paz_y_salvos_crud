@@ -2,34 +2,39 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 )
 
 type Semaforo struct {
-	Id                int       `orm:"column(id);pk;auto"`
-	CodigoEstudiante  float64   `orm:"column(codigo_estudiante);null"`
-	IdFacultadOikos   int16     `orm:"column(id_facultad_oikos);null"`
-	IdProyectoOikos   int16     `orm:"column(id_proyecto_oikos);null"`
-	IdFacultadGedep   int16     `orm:"column(id_facultad_gedep);null"`
-	IdProyectoAccra   int16     `orm:"column(id_proyecto_accra);null"`
-	AnioInsGrado      float64   `orm:"column(anio_ins_grado);null"`
-	PerInsGrado       float64   `orm:"column(per_ins_grado);null"`
-	Academico         bool      `orm:"column(academico);null"`
-	Financiero        bool      `orm:"column(financiero);null"`
-	Biblioteca        bool      `orm:"column(biblioteca);null"`
-	Laboratorios      bool      `orm:"column(laboratorios);null"`
-	Bienestar         bool      `orm:"column(bienestar);null"`
-	Urelinter         bool      `orm:"column(urelinter);null"`
-	Orc               bool      `orm:"column(orc);null"`
-	Observacion       string    `orm:"column(observacion);null"`
-	Activo            bool      `orm:"column(activo);null"`
-	FechaCreacion     time.Time `orm:"auto_now_add;column(fecha_creacion);type(timestamp without time zone)"`
-	FechaModificacion time.Time `orm:"auto_now;column(fecha_modificacion);type(timestamp without time zone)"`
+	Id                      int       `orm:"column(id);pk;auto"`
+	CodigoEstudiante        float64   `orm:"column(codigo_estudiante);null"`
+	IdFacultadOikos         int16     `orm:"column(id_facultad_oikos);null"`
+	IdProyectoOikos         int16     `orm:"column(id_proyecto_oikos);null"`
+	IdFacultadGedep         int16     `orm:"column(id_facultad_gedep);null"`
+	IdProyectoAccra         int16     `orm:"column(id_proyecto_accra);null"`
+	AnioInsGrado            float64   `orm:"column(anio_ins_grado);null"`
+	PerInsGrado             float64   `orm:"column(per_ins_grado);null"`
+	Academico               bool      `orm:"column(academico);null"`
+	Financiero              bool      `orm:"column(financiero);null"`
+	Biblioteca              bool      `orm:"column(biblioteca);null"`
+	Laboratorios            bool      `orm:"column(laboratorios);null"`
+	Bienestar               bool      `orm:"column(bienestar);null"`
+	Urelinter               bool      `orm:"column(urelinter);null"`
+	Orc                     bool      `orm:"column(orc);null"`
+	ObservacionCoordinacion string    `orm:"column(observacion_coordinacion);null"`
+	ObservacionBiblioteca   string    `orm:"column(observacion_biblioteca);null"`
+	ObservacionLaboratorios string    `orm:"column(observacion_laboratorios);null"`
+	ObservacionBienestar    string    `orm:"column(observacion_bienestar);null"`
+	ObservacionUrelinter    string    `orm:"column(observacion_urelinter);null"`
+	ObservacionOrc          string    `orm:"column(observacion_orc);null"`
+	Activo                  bool      `orm:"column(activo);null"`
+	FechaCreacion           time.Time `orm:"auto_now_add;column(fecha_creacion);type(timestamp without time zone)"`
+	FechaModificacion       time.Time `orm:"auto_now;column(fecha_modificacion);type(timestamp without time zone)"`
 }
 
 func (t *Semaforo) TableName() string {
@@ -152,7 +157,7 @@ func UpdateSemaforoById(m *Semaforo) (err error) {
 	if err = o.Read(&v); err == nil {
 		var num int64
 		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
+			logs.Info("Number of records updated in database:", num)
 		}
 	}
 	return
@@ -167,7 +172,7 @@ func DeleteSemaforo(id int) (err error) {
 	if err = o.Read(&v); err == nil {
 		var num int64
 		if num, err = o.Delete(&Semaforo{Id: id}); err == nil {
-			fmt.Println("Number of records deleted in database:", num)
+			logs.Info("Number of records deleted in database:", num)
 		}
 	}
 	return
