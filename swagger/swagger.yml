@@ -196,7 +196,17 @@ definitions:
         format: int32
       Laboratorios:
         type: boolean
-      Observacion:
+      ObservacionBiblioteca:
+        type: string
+      ObservacionBienestar:
+        type: string
+      ObservacionCoordinacion:
+        type: string
+      ObservacionLaboratorios:
+        type: string
+      ObservacionOrc:
+        type: string
+      ObservacionUrelinter:
         type: string
       Orc:
         type: boolean
