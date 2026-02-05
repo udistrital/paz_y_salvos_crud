@@ -25,7 +25,7 @@ type Semaforo struct {
 	Laboratorios            bool      `orm:"column(laboratorios);null"`
 	Bienestar               bool      `orm:"column(bienestar);null"`
 	Urelinter               bool      `orm:"column(urelinter);null"`
-	Orc                     bool      `orm:"column(orc);null"`
+	Orc                     *bool     `orm:"column(orc);null"`
 	ObservacionCoordinacion string    `orm:"column(observacion_coordinacion);null"`
 	ObservacionBiblioteca   string    `orm:"column(observacion_biblioteca);null"`
 	ObservacionLaboratorios string    `orm:"column(observacion_laboratorios);null"`
@@ -178,10 +178,10 @@ func DeleteSemaforo(id int) (err error) {
 	return
 }
 
+// PatchSemaforo actualiza campos parciales de un Semaforo
 func PatchSemaforo(id int, params map[string]interface{}) error {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Semaforo))
-	// Filter por id y aplicar sólo los parámestros pasados
 	if _, err := qs.Filter("id", id).Update(params); err != nil {
 		return err
 	}
