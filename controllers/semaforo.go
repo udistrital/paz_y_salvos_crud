@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/udistrital/paz_y_salvos_crud/models"
+	"github.com/udistrital/paz_y_salvos_crud/services"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -241,18 +242,39 @@ func (c *SemaforoController) Patch() {
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &fields); err != nil {
 		logs.Error(err)
 		c.Abort("400")
+		return
 	}
 
-	if err := models.PatchSemaforo(id, fields); err != nil {
+	if err := services.PatchSemaforoWithValidation(id, fields); err != nil {
 		logs.Error(err)
+		errorMsg := err.Error()
+
+		// Si es un error de validación de reglas de negocio, retornar 409 Conflict
+		if strings.Contains(errorMsg, "ORC") ||
+			strings.Contains(errorMsg, "dependencias") ||
+			strings.Contains(errorMsg, "activo") {
+			c.Data["json"] = map[string]interface{}{
+				"Success": false,
+				"Status":  "409",
+				"Message": errorMsg,
+				"Data":    nil,
+			}
+			c.Ctx.Output.SetStatus(409)
+			c.ServeJSON()
+			return
+		}
+
+		// Para otros errores, retornar 400
 		c.Data["mesaage"] = "Error service Patch: datos inválidos o parámetro incorrecto"
 		c.Abort("400")
+		return
 	}
 
 	updated, err := models.GetSemaforoById(id)
 	if err != nil {
 		logs.Error(err)
 		c.Abort("404")
+		return
 	}
 	c.Data["json"] = map[string]interface{}{
 		"Success": true, "Status": "200", "Message": "Patch successful", "Data": updated,

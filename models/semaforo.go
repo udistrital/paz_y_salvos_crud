@@ -178,10 +178,10 @@ func DeleteSemaforo(id int) (err error) {
 	return
 }
 
+// PatchSemaforo actualiza campos parciales de un Semaforo
 func PatchSemaforo(id int, params map[string]interface{}) error {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Semaforo))
-	// Filter por id y aplicar sólo los parámestros pasados
 	if _, err := qs.Filter("id", id).Update(params); err != nil {
 		return err
 	}
