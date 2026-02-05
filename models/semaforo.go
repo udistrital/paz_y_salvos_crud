@@ -25,7 +25,7 @@ type Semaforo struct {
 	Laboratorios            bool      `orm:"column(laboratorios);null"`
 	Bienestar               bool      `orm:"column(bienestar);null"`
 	Urelinter               bool      `orm:"column(urelinter);null"`
-	Orc                     bool      `orm:"column(orc);null"`
+	Orc                     *bool     `orm:"column(orc);null"`
 	ObservacionCoordinacion string    `orm:"column(observacion_coordinacion);null"`
 	ObservacionBiblioteca   string    `orm:"column(observacion_biblioteca);null"`
 	ObservacionLaboratorios string    `orm:"column(observacion_laboratorios);null"`
