@@ -128,6 +128,8 @@ func validateFieldChangesWhenOrcActive(currentRecord *models.Semaforo, params ma
 			currentValue = currentRecord.ObservacionUrelinter
 		case "ObservacionOrc":
 			currentValue = currentRecord.ObservacionOrc
+		case "ObservacionFinanciera":
+			currentValue = currentRecord.ObservacionFinanciera
 		default:
 			continue
 		}

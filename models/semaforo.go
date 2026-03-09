@@ -32,6 +32,7 @@ type Semaforo struct {
 	ObservacionBienestar    string    `orm:"column(observacion_bienestar);null"`
 	ObservacionUrelinter    string    `orm:"column(observacion_urelinter);null"`
 	ObservacionOrc          string    `orm:"column(observacion_orc);null"`
+	ObservacionFinanciera   string    `orm:"column(observacion_financiera);null"`
 	Activo                  bool      `orm:"column(activo);null"`
 	FechaCreacion           time.Time `orm:"auto_now_add;column(fecha_creacion);type(timestamp without time zone)"`
 	FechaModificacion       time.Time `orm:"auto_now;column(fecha_modificacion);type(timestamp without time zone)"`
