@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/astaxie/beego/orm"
 	"github.com/udistrital/paz_y_salvos_crud/models"
@@ -95,7 +96,7 @@ func validateOrcUpdate(currentRecord *models.Semaforo, orcValue interface{}) err
 	return nil
 }
 
-// validateFieldChangesWhenOrcActive verifica que cuando ORC está activo solo se modifique ORC
+// validateFieldChangesWhenOrcActive verifica que cuando ORC está activo solo se modifiquen ORC y campos de observación
 func validateFieldChangesWhenOrcActive(currentRecord *models.Semaforo, params map[string]interface{}) error {
 	// Verificar qué campos están realmente cambiando comparando con el registro actual
 	for field, newValue := range params {
@@ -137,9 +138,11 @@ func validateFieldChangesWhenOrcActive(currentRecord *models.Semaforo, params ma
 		// Comparar valores para detectar si hay un cambio real
 		isChanging := isFieldChanging(field, currentValue, newValue, currentRecord)
 
-		// Si el campo está cambiando y no es ORC, bloquear
-		if isChanging && field != "Orc" {
-			return errors.New("No se pueden modificar campos cuando ORC no es neutro. Solo se permite actualizar el campo ORC")
+		isObservationField := strings.HasPrefix(field, "Observacion")
+
+		// Si el campo está cambiando y no es ORC ni un campo de observación, bloquear
+		if isChanging && field != "Orc" && !isObservationField {
+			return errors.New("No se pueden modificar campos cuando ORC no es neutro. Solo se permite actualizar el campo ORC y observaciones")
 		}
 	}
 
