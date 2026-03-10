@@ -202,6 +202,8 @@ definitions:
         type: string
       ObservacionCoordinacion:
         type: string
+      ObservacionFinanciera:
+        type: string
       ObservacionLaboratorios:
         type: string
       ObservacionOrc:
