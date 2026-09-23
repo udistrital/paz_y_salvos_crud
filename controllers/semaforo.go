@@ -1,15 +1,18 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
+	"net/http"
 	"strconv"
 	"strings"
 
+	"github.com/udistrital/paz_y_salvos_crud/helpers"
 	"github.com/udistrital/paz_y_salvos_crud/models"
 	"github.com/udistrital/paz_y_salvos_crud/services"
 
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
+	"github.com/beego/beego/v2/core/logs"
+	beego "github.com/beego/beego/v2/server/web"
 )
 
 // SemaforoController operations for Semaforo
@@ -24,53 +27,58 @@ func (c *SemaforoController) URLMapping() {
 	c.Mapping("GetAll", c.GetAll)
 	c.Mapping("Put", c.Put)
 	c.Mapping("Delete", c.Delete)
+	c.Mapping("Patch", c.Patch)
 }
 
 // Post ...
 // @Title Post
 // @Description create Semaforo
 // @Param	body		body 	models.Semaforo	true		"body for Semaforo content"
-// @Success 201 {int} models.Semaforo
-// @Failure 403 body is empty
+// @Success 201 {object} models.APIResponse
+// @Failure 400 {object} models.APIResponse
 // @router / [post]
 func (c *SemaforoController) Post() {
 	var v models.Semaforo
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		if _, err := models.AddSemaforo(&v); err == nil {
-			c.Ctx.Output.SetStatus(201)
-			c.Data["json"] = map[string]interface{}{"Success": true, "Status": "201", "Message": "Registration successful", "Data": v}
-		} else {
-			logs.Error(err)
-			c.Data["mesaage"] = "Error service POST: The request contains an incorrect data type or an invalid parameter"
-			c.Abort("400")
-		}
-	} else {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
 		logs.Error(err)
-		c.Data["mesaage"] = "Error service POST: The request contains an incorrect data type or an invalid parameter"
-		c.Abort("400")
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "La solicitud contiene un tipo de dato incorrecto o un parámetro inválido")
+		return
 	}
-	c.ServeJSON()
+
+	if _, err := models.AddSemaforo(&v); err != nil {
+		logs.Error(err)
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "No se pudo crear el semáforo con los datos enviados")
+		return
+	}
+
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusCreated, Message: "Registro creado correctamente", Data: v})
 }
 
 // GetOne ...
 // @Title Get One
 // @Description get Semaforo by id
 // @Param	id		path 	string	true		"The key for staticblock"
-// @Success 200 {object} models.Semaforo
-// @Failure 403 :id is empty
+// @Success 200 {object} models.APIResponse
+// @Failure 400 {object} models.APIResponse
+// @Failure 404 {object} models.APIResponse
 // @router /:id [get]
 func (c *SemaforoController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		logs.Error(err)
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "El identificador debe ser un número entero")
+		return
+	}
+
 	v, err := models.GetSemaforoById(id)
 	if err != nil {
 		logs.Error(err)
-		c.Data["mesaage"] = "Error service GetOne: The request contains an incorrect parameter or no record exists"
-		c.Abort("404")
-	} else {
-		c.Data["json"] = map[string]interface{}{"Success": true, "Status": "200", "Message": "Request successful", "Data": v}
+		helpers.RenderError(&c.Controller, http.StatusNotFound, "No se encontró el semáforo solicitado")
+		return
 	}
-	c.ServeJSON()
+
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Consulta exitosa", Data: v})
 }
 
 // GetAll ...
@@ -82,8 +90,9 @@ func (c *SemaforoController) GetOne() {
 // @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
 // @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
 // @Param	offset	query	string	false	"Start position of result set. Must be an integer"
-// @Success 200 {object} models.Semaforo
-// @Failure 403
+// @Success 200 {object} models.APIResponse
+// @Failure 400 {object} models.APIResponse
+// @Failure 404 {object} models.APIResponse
 // @router / [get]
 func (c *SemaforoController) GetAll() {
 	var fields []string
@@ -118,13 +127,7 @@ func (c *SemaforoController) GetAll() {
 		for _, cond := range strings.Split(v, ",") {
 			kv := strings.SplitN(cond, ":", 2)
 			if len(kv) != 2 {
-				c.Data["json"] = map[string]interface{}{
-					"Success": false,
-					"Status":  "400",
-					"Message": "Error: invalid query key/value pair",
-					"Data":    nil,
-				}
-				c.ServeJSON()
+				helpers.RenderError(&c.Controller, http.StatusBadRequest, "El filtro de consulta debe tener el formato clave:valor")
 				return
 			}
 			k, v := kv[0], kv[1]
@@ -135,21 +138,11 @@ func (c *SemaforoController) GetAll() {
 	l, err := models.GetAllSemaforo(query, fields, sortby, order, offset, limit)
 	if err != nil {
 		logs.Error(err)
-		c.Data["json"] = map[string]interface{}{
-			"Success": false,
-			"Status":  "404",
-			"Message": "Error service GetAll: The request contains an incorrect parameter or no record exists",
-			"Data":    nil,
-		}
-	} else {
-		c.Data["json"] = map[string]interface{}{
-			"Success": true,
-			"Status":  "200",
-			"Message": "Request successful",
-			"Data":    l,
-		}
+		helpers.RenderError(&c.Controller, http.StatusNotFound, "No se encontraron semáforos para los parámetros enviados")
+		return
 	}
-	c.ServeJSON()
+
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Consulta exitosa", Data: l})
 }
 
 // Put ...
@@ -157,31 +150,30 @@ func (c *SemaforoController) GetAll() {
 // @Description update the Semaforo
 // @Param	id		path 	string	true		"The id you want to update"
 // @Param	body		body 	models.Semaforo	true		"body for Semaforo content"
-// @Success 200 {object} models.Semaforo
-// @Failure 403 :id is not int
+// @Success 200 {object} models.APIResponse
+// @Failure 400 {object} models.APIResponse
+// @Failure 404 {object} models.APIResponse
 // @router /:id [put]
 func (c *SemaforoController) Put() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		logs.Error(err)
-		c.Abort("400")
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "El identificador debe ser un número entero")
 		return
 	}
 
 	var v models.Semaforo
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
 		logs.Error(err)
-		c.Data["mesaage"] = "Error service Put: The request contains an incorrect data type or an invalid parameter"
-		c.Abort("400")
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "La solicitud contiene un tipo de dato incorrecto o un parámetro inválido")
 		return
 	}
 	v.Id = id // Asegura que el id es el correcto
 
 	if err := models.UpdateSemaforoById(&v); err != nil {
 		logs.Error(err)
-		c.Data["mesaage"] = "Error service Put: The request contains an incorrect data type or an invalid parameter"
-		c.Abort("400")
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "No se pudo actualizar el semáforo con los datos enviados")
 		return
 	}
 
@@ -189,63 +181,68 @@ func (c *SemaforoController) Put() {
 	updated, err := models.GetSemaforoById(id)
 	if err != nil {
 		logs.Error(err)
-		c.Abort("404")
+		helpers.RenderError(&c.Controller, http.StatusNotFound, "No se encontró el semáforo actualizado")
 		return
 	}
-	c.Data["json"] = map[string]interface{}{
-		"Success": true,
-		"Status":  "200",
-		"Message": "Update successful",
-		"Data":    updated,
-	}
-	c.ServeJSON()
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Registro actualizado correctamente", Data: updated})
 }
 
 // Delete ...
 // @Title Delete
 // @Description delete the Semaforo
 // @Param	id		path 	string	true		"The id you want to delete"
-// @Success 200 {string} delete success!
-// @Failure 403 id is empty
+// @Success 200 {object} models.APIResponse
+// @Failure 400 {object} models.APIResponse
+// @Failure 404 {object} models.APIResponse
 // @router /:id [delete]
 func (c *SemaforoController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.Atoi(idStr)
-	if err := models.DeleteSemaforo(id); err == nil {
-		d := map[string]interface{}{"Id": id}
-		c.Data["json"] = map[string]interface{}{"Success": true, "Status": "200", "Message": "Delete successful", "Data": d}
-	} else {
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
 		logs.Error(err)
-		c.Data["mesaage"] = "Error service Delete: Request contains incorrect parameter"
-		c.Abort("404")
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "El identificador debe ser un número entero")
+		return
 	}
-	c.ServeJSON()
+
+	if err := models.DeleteSemaforo(id); err != nil {
+		logs.Error(err)
+		helpers.RenderError(&c.Controller, http.StatusNotFound, "No se encontró el semáforo que se desea eliminar")
+		return
+	}
+
+	data := models.DeletedSemaforoResponse{Id: id}
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Registro eliminado correctamente", Data: data})
 }
 
 // Patch ...
 // @Title Patch
 // @Description update partial fields of Semaforo
 // @Param   id      path    string                 true        "The id you want to patch"
-// @Param   body    body    map[string]interface{} true        "Fields to update"
-// @Success 200 {object} models.Semaforo
-// @Failure 400 : invalid data or parameter
+// @Param   body    body    models.SemaforoPatch true        "Fields to update"
+// @Success 200 {object} models.APIResponse
+// @Failure 400 {object} models.APIResponse
+// @Failure 404 {object} models.APIResponse
+// @Failure 409 {object} models.APIResponse
 // @router /:id [patch]
 func (c *SemaforoController) Patch() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		logs.Error(err)
-		c.Abort("400")
-	}
-
-	var fields map[string]interface{}
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &fields); err != nil {
-		logs.Error(err)
-		c.Abort("400")
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "El identificador debe ser un número entero")
 		return
 	}
 
-	if err := services.PatchSemaforoWithValidation(id, fields); err != nil {
+	var patch models.SemaforoPatch
+	decoder := json.NewDecoder(bytes.NewReader(c.Ctx.Input.RequestBody))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&patch); err != nil {
+		logs.Error(err)
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "La solicitud contiene un tipo de dato incorrecto o un parámetro inválido")
+		return
+	}
+
+	if err := services.PatchSemaforoWithValidation(id, patch); err != nil {
 		logs.Error(err)
 		errorMsg := err.Error()
 
@@ -253,31 +250,20 @@ func (c *SemaforoController) Patch() {
 		if strings.Contains(errorMsg, "ORC") ||
 			strings.Contains(errorMsg, "dependencias") ||
 			strings.Contains(errorMsg, "activo") {
-			c.Data["json"] = map[string]interface{}{
-				"Success": false,
-				"Status":  "409",
-				"Message": errorMsg,
-				"Data":    nil,
-			}
-			c.Ctx.Output.SetStatus(409)
-			c.ServeJSON()
+			helpers.RenderError(&c.Controller, http.StatusConflict, errorMsg)
 			return
 		}
 
 		// Para otros errores, retornar 400
-		c.Data["mesaage"] = "Error service Patch: datos inválidos o parámetro incorrecto"
-		c.Abort("400")
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "No se pudo actualizar parcialmente el semáforo con los datos enviados")
 		return
 	}
 
 	updated, err := models.GetSemaforoById(id)
 	if err != nil {
 		logs.Error(err)
-		c.Abort("404")
+		helpers.RenderError(&c.Controller, http.StatusNotFound, "No se encontró el semáforo actualizado")
 		return
 	}
-	c.Data["json"] = map[string]interface{}{
-		"Success": true, "Status": "200", "Message": "Patch successful", "Data": updated,
-	}
-	c.ServeJSON()
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Registro actualizado parcialmente", Data: updated})
 }

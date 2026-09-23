@@ -64,11 +64,20 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Semaforo"
+							"$ref": "#/definitions/models.APIResponse"
                         }
                     },
-                    "403": {
-                        "description": ""
+					"400": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
+					},
+					"404": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
                     }
                 }
             },
@@ -91,10 +100,16 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "{int} models.Semaforo"
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
                     },
-                    "403": {
-                        "description": "body is empty"
+					"400": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
                     }
                 }
             }
@@ -119,11 +134,20 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Semaforo"
+							"$ref": "#/definitions/models.APIResponse"
                         }
                     },
-                    "403": {
-                        "description": ":id is empty"
+					"400": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
+					},
+					"404": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
                     }
                 }
             },
@@ -155,11 +179,20 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Semaforo"
+							"$ref": "#/definitions/models.APIResponse"
                         }
                     },
-                    "403": {
-                        "description": ":id is not int"
+					"400": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
+					},
+					"404": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
                     }
                 }
             },
@@ -180,10 +213,22 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "{string} delete success!"
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
                     },
-                    "403": {
-                        "description": "id is empty"
+					"400": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
+					},
+					"404": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
                     }
                 }
             },
@@ -207,7 +252,7 @@
                         "description": "Fields to update",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/map[string]interface{}"
+                            "$ref": "#/definitions/models.SemaforoPatch"
                         }
                     }
                 ],
@@ -215,21 +260,71 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Semaforo"
+							"$ref": "#/definitions/models.APIResponse"
                         }
                     },
                     "400": {
-                        "description": ": invalid data or parameter"
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
+					},
+					"404": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
+					},
+					"409": {
+						"description": "",
+						"schema": {
+							"$ref": "#/definitions/models.APIResponse"
+						}
                     }
                 }
             }
         }
     },
     "definitions": {
-        "map[string]interface{}": {
-            "title": "map[string]interface{}",
-            "type": "object"
-        },
+		"models.SemaforoPatch": {
+			"title": "SemaforoPatch",
+			"type": "object",
+			"properties": {
+				"Academico": {"type": "boolean"},
+				"Financiero": {"type": "boolean"},
+				"Biblioteca": {"type": "boolean"},
+				"Laboratorios": {"type": "boolean"},
+				"Bienestar": {"type": "boolean"},
+				"Urelinter": {"type": "boolean"},
+				"Orc": {"type": "boolean", "x-nullable": true},
+				"ObservacionCoordinacion": {"type": "string"},
+				"ObservacionBiblioteca": {"type": "string"},
+				"ObservacionLaboratorios": {"type": "string"},
+				"ObservacionBienestar": {"type": "string"},
+				"ObservacionUrelinter": {"type": "string"},
+				"ObservacionOrc": {"type": "string"},
+				"ObservacionFinanciera": {"type": "string"}
+			}
+		},
+		"models.APIResponse": {
+			"title": "APIResponse",
+			"type": "object",
+			"properties": {
+				"Data": {
+					"type": "object"
+				},
+				"Message": {
+					"type": "object"
+				},
+				"Status": {
+					"type": "integer",
+					"format": "int64"
+				},
+				"Success": {
+					"type": "boolean"
+				}
+			}
+		},
         "models.Semaforo": {
             "title": "Semaforo",
             "type": "object",

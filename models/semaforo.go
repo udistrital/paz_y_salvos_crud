@@ -2,12 +2,11 @@ package models
 
 import (
 	"errors"
-	"reflect"
 	"strings"
 	"time"
 
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 )
 
 type Semaforo struct {
@@ -68,7 +67,7 @@ func GetSemaforoById(id int) (v *Semaforo, err error) {
 // GetAllSemaforo retrieves all Semaforo matches certain condition. Returns empty list if
 // no records exist
 func GetAllSemaforo(query map[string]string, fields []string, sortby []string, order []string,
-	offset int64, limit int64) (ml []interface{}, err error) {
+	offset int64, limit int64) (result interface{}, err error) {
 
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Semaforo))
@@ -131,20 +130,18 @@ func GetAllSemaforo(query map[string]string, fields []string, sortby []string, o
 	var l []Semaforo
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
-			for _, v := range l {
-				ml = append(ml, v)
-			}
+			return l, nil
 		} else {
+			selected := make([]SemaforoFields, 0, len(l))
 			for _, v := range l {
-				m := make(map[string]interface{})
-				val := reflect.ValueOf(v)
-				for _, fname := range fields {
-					m[fname] = val.FieldByName(fname).Interface()
+				row, selectionErr := selectSemaforoFields(v, fields)
+				if selectionErr != nil {
+					return nil, selectionErr
 				}
-				ml = append(ml, m)
+				selected = append(selected, row)
 			}
+			return selected, nil
 		}
-		return ml, nil
 	}
 	return nil, err
 }
@@ -177,14 +174,4 @@ func DeleteSemaforo(id int) (err error) {
 		}
 	}
 	return
-}
-
-// PatchSemaforo actualiza campos parciales de un Semaforo
-func PatchSemaforo(id int, params map[string]interface{}) error {
-	o := orm.NewOrm()
-	qs := o.QueryTable(new(Semaforo))
-	if _, err := qs.Filter("id", id).Update(params); err != nil {
-		return err
-	}
-	return nil
 }

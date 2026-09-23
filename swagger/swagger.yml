@@ -46,9 +46,15 @@ paths:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/models.Semaforo'
-        "403":
+            $ref: '#/definitions/models.APIResponse'
+        "400":
           description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
     post:
       tags:
       - semaforo
@@ -63,9 +69,13 @@ paths:
           $ref: '#/definitions/models.Semaforo'
       responses:
         "201":
-          description: '{int} models.Semaforo'
-        "403":
-          description: body is empty
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
   /semaforo/{id}:
     get:
       tags:
@@ -82,9 +92,15 @@ paths:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/models.Semaforo'
-        "403":
-          description: :id is empty
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
     put:
       tags:
       - semaforo
@@ -106,9 +122,15 @@ paths:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/models.Semaforo'
-        "403":
-          description: :id is not int
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
     delete:
       tags:
       - semaforo
@@ -122,9 +144,17 @@ paths:
         type: string
       responses:
         "200":
-          description: '{string} delete success!'
-        "403":
-          description: id is empty
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "400":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
     patch:
       tags:
       - semaforo
@@ -141,18 +171,71 @@ paths:
         description: Fields to update
         required: true
         schema:
-          $ref: '#/definitions/map[string]interface{}'
+          $ref: '#/definitions/models.SemaforoPatch'
       responses:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/models.Semaforo'
+            $ref: '#/definitions/models.APIResponse'
         "400":
-          description: ': invalid data or parameter'
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "404":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
+        "409":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.APIResponse'
 definitions:
-  map[string]interface{}:
-    title: map[string]interface{}
+  models.SemaforoPatch:
+    title: SemaforoPatch
     type: object
+    properties:
+      Academico:
+        type: boolean
+      Financiero:
+        type: boolean
+      Biblioteca:
+        type: boolean
+      Laboratorios:
+        type: boolean
+      Bienestar:
+        type: boolean
+      Urelinter:
+        type: boolean
+      Orc:
+        type: boolean
+        x-nullable: true
+      ObservacionCoordinacion:
+        type: string
+      ObservacionBiblioteca:
+        type: string
+      ObservacionLaboratorios:
+        type: string
+      ObservacionBienestar:
+        type: string
+      ObservacionUrelinter:
+        type: string
+      ObservacionOrc:
+        type: string
+      ObservacionFinanciera:
+        type: string
+  models.APIResponse:
+    title: APIResponse
+    type: object
+    properties:
+      Data:
+        type: object
+      Message:
+        type: object
+      Status:
+        type: integer
+        format: int64
+      Success:
+        type: boolean
   models.Semaforo:
     title: Semaforo
     type: object
