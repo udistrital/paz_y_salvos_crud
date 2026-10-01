@@ -20,6 +20,12 @@ func init() {
 				&controllers.SemaforoController{},
 			),
 		),
+		beego.NSNamespace("/solicitud-grado",
+			beego.NSRouter("/borrador/:id/soportes/:tipo", &controllers.InscripcionGradoController{}, "put:AsociarSoporte"),
+			beego.NSRouter("/borrador/:id/radicar", &controllers.InscripcionGradoController{}, "post:Radicar"),
+			beego.NSRouter("/borrador", &controllers.InscripcionGradoController{}, "post:CrearBorrador;get:ConsultarBorrador"),
+			beego.NSRouter("/borrador/:id", &controllers.InscripcionGradoController{}, "get:ConsultarBorradorPorID;put:ActualizarBorrador"),
+		),
 	)
 	beego.AddNamespace(ns)
 }
