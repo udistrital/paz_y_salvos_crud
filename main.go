@@ -1,18 +1,18 @@
 package main
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
-	"github.com/astaxie/beego/orm"
-	"github.com/astaxie/beego/plugins/cors"
+	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
+	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/beego/v2/server/web/filter/cors"
 	_ "github.com/lib/pq"
 	_ "github.com/udistrital/paz_y_salvos_crud/routers"
-	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
-	"github.com/udistrital/utils_oas/auditoria"
-	"github.com/udistrital/utils_oas/customerrorv2"
-	"github.com/udistrital/utils_oas/database"
-	"github.com/udistrital/utils_oas/security"
-	"github.com/udistrital/utils_oas/xray"
+	apistatus "github.com/udistrital/utils_oas/v2/apiStatusLib"
+	"github.com/udistrital/utils_oas/v2/auditoria"
+	"github.com/udistrital/utils_oas/v2/customerror"
+	"github.com/udistrital/utils_oas/v2/database"
+	"github.com/udistrital/utils_oas/v2/security"
+	"github.com/udistrital/utils_oas/v2/xray"
 )
 
 func main() {
@@ -49,13 +49,10 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	err = xray.InitXRay()
-	if err != nil {
-		logs.Error("error configurando AWS XRay: %v", err)
-	}
 	apistatus.Init()
 	auditoria.InitMiddleware()
-	beego.ErrorController(&customerrorv2.CustomErrorController{})
 	security.SetSecurityHeaders()
+	xray.Init()
+	beego.ErrorController(&customerror.CustomErrorController{})
 	beego.Run()
 }

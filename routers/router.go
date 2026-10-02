@@ -8,7 +8,7 @@
 package routers
 
 import (
-	"github.com/astaxie/beego"
+	beego "github.com/beego/beego/v2/server/web"
 	"github.com/udistrital/paz_y_salvos_crud/controllers"
 )
 
@@ -19,6 +19,12 @@ func init() {
 			beego.NSInclude(
 				&controllers.SemaforoController{},
 			),
+		),
+		beego.NSNamespace("/solicitud-grado",
+			beego.NSRouter("/borrador/:id/soportes/:tipo", &controllers.InscripcionGradoController{}, "put:AsociarSoporte"),
+			beego.NSRouter("/borrador/:id/radicar", &controllers.InscripcionGradoController{}, "post:Radicar"),
+			beego.NSRouter("/borrador", &controllers.InscripcionGradoController{}, "post:CrearBorrador;get:ConsultarBorrador"),
+			beego.NSRouter("/borrador/:id", &controllers.InscripcionGradoController{}, "get:ConsultarBorradorPorID;put:ActualizarBorrador"),
 		),
 	)
 	beego.AddNamespace(ns)
