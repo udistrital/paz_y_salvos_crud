@@ -11,6 +11,7 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/lib/pq"
 	"github.com/udistrital/paz_y_salvos_crud/models"
+	"github.com/udistrital/paz_y_salvos_crud/utils"
 )
 
 var (
@@ -39,16 +40,17 @@ func CrearBorradorInscripcionGrado(entrada models.CrearBorradorInscripcionGrado)
 	}
 
 	resultado := &models.BorradorInscripcionGrado{Soportes: []models.SoporteGrado{}}
+	ahora := utils.HoraBogota()
 	err = tx.Raw(`
 		INSERT INTO paz_y_salvos.solicitud_grado
 			(tercero_id, codigo_estudiante, periodo_id, programa_academico_id,
 			 dependencia_oikos_id, calendario_evento_inscripcion_id,
-			 calendario_evento_aprobacion_id)
-		VALUES (?, ?, ?, ?, ?, ?, ?)
+			 calendario_evento_aprobacion_id, fecha_creacion, fecha_modificacion)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 		RETURNING *`,
 		entrada.TerceroId, entrada.CodigoEstudiante, entrada.PeriodoId,
 		entrada.ProgramaAcademicoId, entrada.DependenciaOikosId,
-		entrada.CalendarioEventoInscripcionId, entrada.CalendarioEventoAprobacionId,
+		entrada.CalendarioEventoInscripcionId, entrada.CalendarioEventoAprobacionId, ahora, ahora,
 	).QueryRow(&resultado.Solicitud)
 	if err != nil {
 		var pqErr *pq.Error
@@ -60,9 +62,9 @@ func CrearBorradorInscripcionGrado(entrada models.CrearBorradorInscripcionGrado)
 
 	err = tx.Raw(`
 		INSERT INTO paz_y_salvos.formulario_solicitud_grado
-			(solicitud_grado_id, version, contenido)
-		VALUES (?, 1, ?::jsonb)
-		RETURNING *`, resultado.Solicitud.Id, string(entrada.Contenido),
+			(solicitud_grado_id, version, contenido, fecha_creacion, fecha_modificacion)
+		VALUES (?, 1, ?::jsonb, ?, ?)
+		RETURNING *`, resultado.Solicitud.Id, string(entrada.Contenido), ahora, ahora,
 	).QueryRow(&resultado.Formulario)
 	if err != nil {
 		return rollback(fmt.Errorf("crear formulario de grado: %w", err))
@@ -71,10 +73,10 @@ func CrearBorradorInscripcionGrado(entrada models.CrearBorradorInscripcionGrado)
 	err = tx.Raw(`
 		INSERT INTO paz_y_salvos.historial_solicitud_grado
 			(solicitud_grado_id, formulario_solicitud_grado_id, tercero_id,
-			 estado_solicitud_id, justificacion)
-		VALUES (?, ?, ?, ?, 'Borrador creado por el estudiante')
+			 estado_solicitud_id, justificacion, fecha_creacion, fecha_modificacion)
+		VALUES (?, ?, ?, ?, 'Borrador creado por el estudiante', ?, ?)
 		RETURNING *`, resultado.Solicitud.Id, resultado.Formulario.Id,
-		entrada.TerceroId, entrada.EstadoBorradorId,
+		entrada.TerceroId, entrada.EstadoBorradorId, ahora, ahora,
 	).QueryRow(&resultado.Historial)
 	if err != nil {
 		return rollback(fmt.Errorf("crear historial del borrador: %w", err))
@@ -99,21 +101,23 @@ func contenidoRadicacionValido(contenido json.RawMessage) bool {
 		return false
 	}
 	var formulario struct {
-		TrabajoGrado             string `json:"trabajoGrado"`
-		Director1                string `json:"director1"`
-		Director2                string `json:"director2"`
-		Modalidad                int64  `json:"modalidad"`
-		LugarExpedicionDocumento string `json:"lugarExpedicionDocumento"`
-		NumeroActaSustentacion   string `json:"numeroActaSustentacion"`
-		NumeroRegistroSNP        string `json:"numeroRegistroSnp"`
-		TrabajaActualmente       *bool  `json:"trabajaActualmente"`
-		Empresa                  string `json:"empresa"`
-		DireccionEmpresa         string `json:"direccionEmpresa"`
-		TelefonoEmpresa          string `json:"telefonoEmpresa"`
+		TrabajoGrado               string `json:"trabajoGrado"`
+		Director1                  string `json:"director1"`
+		Director2                  string `json:"director2"`
+		Modalidad                  string `json:"modalidad"`
+		LugarExpedicionDocumentoId int64  `json:"lugarExpedicionDocumentoId"`
+		LugarExpedicionDocumento   string `json:"lugarExpedicionDocumento"`
+		NumeroActaSustentacion     string `json:"numeroActaSustentacion"`
+		NumeroRegistroSNP          string `json:"numeroRegistroSnp"`
+		TrabajaActualmente         *bool  `json:"trabajaActualmente"`
+		Empresa                    string `json:"empresa"`
+		DireccionEmpresa           string `json:"direccionEmpresa"`
+		TelefonoEmpresa            string `json:"telefonoEmpresa"`
 	}
 	if json.Unmarshal(contenido, &formulario) != nil || strings.TrimSpace(formulario.TrabajoGrado) == "" ||
-		!cedulaGradoValida.MatchString(strings.TrimSpace(formulario.Director1)) || formulario.Modalidad <= 0 ||
-		strings.TrimSpace(formulario.LugarExpedicionDocumento) == "" || strings.TrimSpace(formulario.NumeroActaSustentacion) == "" ||
+		!cedulaGradoValida.MatchString(strings.TrimSpace(formulario.Director1)) || strings.TrimSpace(formulario.Modalidad) == "" ||
+		formulario.LugarExpedicionDocumentoId <= 0 || strings.TrimSpace(formulario.LugarExpedicionDocumento) == "" ||
+		strings.TrimSpace(formulario.NumeroActaSustentacion) == "" ||
 		!registroSNPValido.MatchString(strings.TrimSpace(formulario.NumeroRegistroSNP)) || formulario.TrabajaActualmente == nil {
 		return false
 	}
@@ -290,10 +294,11 @@ func ActualizarBorradorInscripcionGrado(id, terceroID, estadoBorradorID int, con
 	if err := cargarBorrador(tx, resultado, estadoBorradorID); err != nil {
 		return rollback(err)
 	}
+	ahora := utils.HoraBogota()
 	if err := tx.Raw(`UPDATE paz_y_salvos.formulario_solicitud_grado
-		SET contenido=?::jsonb, fecha_modificacion=now()
+		SET contenido=?::jsonb, fecha_modificacion=?
 		WHERE id=? AND solicitud_grado_id=? AND fecha_radicacion IS NULL AND activo RETURNING *`,
-		string(contenido), resultado.Formulario.Id, id).QueryRow(&resultado.Formulario); err != nil {
+		string(contenido), ahora, resultado.Formulario.Id, id).QueryRow(&resultado.Formulario); err != nil {
 		return rollback(err)
 	}
 	if err := cargarContenidoFormulario(tx, &resultado.Formulario); err != nil {

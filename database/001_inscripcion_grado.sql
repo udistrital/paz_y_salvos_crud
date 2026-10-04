@@ -11,8 +11,8 @@ CREATE TABLE paz_y_salvos.solicitud_grado (
     programa_academico_id int4 NOT NULL,
     estado_solicitud_id int4 NOT NULL,
     activo bool NOT NULL DEFAULT true,
-    fecha_creacion timestamp NOT NULL DEFAULT now(),
-    fecha_modificacion timestamp NOT NULL DEFAULT now(),
+    fecha_creacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
+    fecha_modificacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
     CONSTRAINT pk_solicitud_grado PRIMARY KEY (id)
 );
 
@@ -39,8 +39,8 @@ CREATE TABLE paz_y_salvos.formulario_solicitud_grado (
     version int2 NOT NULL DEFAULT 1,
     contenido jsonb NOT NULL,
     activo bool NOT NULL DEFAULT true,
-    fecha_creacion timestamp NOT NULL DEFAULT now(),
-    fecha_modificacion timestamp NOT NULL DEFAULT now(),
+    fecha_creacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
+    fecha_modificacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
     CONSTRAINT pk_formulario_solicitud_grado PRIMARY KEY (id),
     CONSTRAINT fk_formulario_solicitud_grado_solicitud_grado
         FOREIGN KEY (solicitud_grado_id)
@@ -64,8 +64,8 @@ CREATE TABLE paz_y_salvos.soporte_solicitud_grado (
     tercero_id int4 NOT NULL,
     rol_usuario varchar(100) NOT NULL,
     activo bool NOT NULL DEFAULT true,
-    fecha_creacion timestamp NOT NULL DEFAULT now(),
-    fecha_modificacion timestamp NOT NULL DEFAULT now(),
+    fecha_creacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
+    fecha_modificacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
     CONSTRAINT pk_soporte_solicitud_grado PRIMARY KEY (id),
     CONSTRAINT fk_soporte_solicitud_grado_solicitud_grado
         FOREIGN KEY (solicitud_grado_id)
@@ -93,8 +93,8 @@ CREATE TABLE paz_y_salvos.historial_soporte_solicitud_grado (
     observacion varchar(500) NULL,
     rol_usuario varchar(100) NOT NULL,
     activo bool NOT NULL DEFAULT true,
-    fecha_creacion timestamp NOT NULL DEFAULT now(),
-    fecha_modificacion timestamp NOT NULL DEFAULT now(),
+    fecha_creacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
+    fecha_modificacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
     CONSTRAINT pk_historial_soporte_solicitud_grado PRIMARY KEY (id),
     CONSTRAINT fk_historial_soporte_solicitud_grado_soporte_solicitud_grado
         FOREIGN KEY (soporte_solicitud_grado_id)
@@ -116,8 +116,8 @@ CREATE TABLE paz_y_salvos.historial_solicitud_grado (
     justificacion varchar(500) NULL,
     rol_usuario varchar(100) NOT NULL,
     activo bool NOT NULL DEFAULT true,
-    fecha_creacion timestamp NOT NULL DEFAULT now(),
-    fecha_modificacion timestamp NOT NULL DEFAULT now(),
+    fecha_creacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
+    fecha_modificacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
     CONSTRAINT pk_historial_solicitud_grado PRIMARY KEY (id),
     CONSTRAINT fk_historial_solicitud_grado_solicitud_grado
         FOREIGN KEY (solicitud_grado_id)
@@ -139,8 +139,8 @@ CREATE TABLE paz_y_salvos.paz_salvo (
     tercero_id int4 NULL,
     observacion varchar(500) NULL,
     activo bool NOT NULL DEFAULT true,
-    fecha_creacion timestamp NOT NULL DEFAULT now(),
-    fecha_modificacion timestamp NOT NULL DEFAULT now(),
+    fecha_creacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
+    fecha_modificacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
     CONSTRAINT pk_paz_salvo PRIMARY KEY (id),
     CONSTRAINT fk_paz_salvo_solicitud_grado
         FOREIGN KEY (solicitud_grado_id)
@@ -167,8 +167,8 @@ CREATE TABLE paz_y_salvos.historial_paz_salvo (
     justificacion varchar(500) NULL,
     rol_usuario varchar(100) NOT NULL,
     activo bool NOT NULL DEFAULT true,
-    fecha_creacion timestamp NOT NULL DEFAULT now(),
-    fecha_modificacion timestamp NOT NULL DEFAULT now(),
+    fecha_creacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
+    fecha_modificacion timestamp NOT NULL DEFAULT timezone('America/Bogota', CURRENT_TIMESTAMP),
     CONSTRAINT pk_historial_paz_salvo PRIMARY KEY (id),
     CONSTRAINT fk_historial_paz_salvo_paz_salvo
         FOREIGN KEY (paz_salvo_id)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/udistrital/paz_y_salvos_crud/models"
+	"github.com/udistrital/paz_y_salvos_crud/utils"
 )
 
 // RadicarInscripcionGrado inmoviliza en una transacción el formulario y sus
@@ -60,19 +61,21 @@ func RadicarInscripcionGrado(id, terceroID int, entrada models.RadicarInscripcio
 	if err != nil || conteo.Total != 4 || conteo.Tipos != 4 || conteo.Documentos != 4 || conteo.Pendientes != 4 || len(resultado.Soportes) != 4 {
 		return nil, fmt.Errorf("%w: se requieren cuatro soportes distintos pendientes de revisión", ErrRadicacionInvalida)
 	}
+	ahora := utils.HoraBogota()
 	if err := tx.Raw(`UPDATE paz_y_salvos.formulario_solicitud_grado
-		SET contenido=?::jsonb, fecha_radicacion=now(), fecha_modificacion=now()
+		SET contenido=?::jsonb, fecha_radicacion=?, fecha_modificacion=?
 		WHERE id=? AND solicitud_grado_id=? AND fecha_radicacion IS NULL AND activo RETURNING *`,
-		string(entrada.Contenido), entrada.FormularioId, id).QueryRow(&resultado.Formulario); err != nil {
+		string(entrada.Contenido), ahora, ahora, entrada.FormularioId, id).QueryRow(&resultado.Formulario); err != nil {
 		return nil, ErrBorradorCerrado
 	}
 	if err := cargarContenidoFormulario(tx, &resultado.Formulario); err != nil {
 		return nil, err
 	}
 	if err := tx.Raw(`INSERT INTO paz_y_salvos.historial_solicitud_grado
-		(solicitud_grado_id, formulario_solicitud_grado_id, tercero_id, estado_solicitud_id, justificacion)
-		VALUES (?, ?, ?, ?, 'Inscripción radicada por el estudiante') RETURNING *`, id, entrada.FormularioId,
-		terceroID, entrada.EstadoRadicadaId).QueryRow(&resultado.Historial); err != nil {
+		(solicitud_grado_id, formulario_solicitud_grado_id, tercero_id, estado_solicitud_id, justificacion,
+		 fecha_creacion, fecha_modificacion)
+		VALUES (?, ?, ?, ?, 'Inscripción radicada por el estudiante', ?, ?) RETURNING *`, id, entrada.FormularioId,
+		terceroID, entrada.EstadoRadicadaId, ahora, ahora).QueryRow(&resultado.Historial); err != nil {
 		return nil, err
 	}
 	if err := tx.Commit(); err != nil {

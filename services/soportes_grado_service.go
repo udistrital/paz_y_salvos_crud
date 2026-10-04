@@ -6,6 +6,7 @@ import (
 
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/udistrital/paz_y_salvos_crud/models"
+	"github.com/udistrital/paz_y_salvos_crud/utils"
 )
 
 // AsociarSoporteBorrador nunca sobrescribe el documento anterior ni sus
@@ -57,20 +58,22 @@ func AsociarSoporteBorrador(id, terceroID, estadoBorradorID, tipoID int, entrada
 	if anterior != nil && anterior.DocumentoId == entrada.DocumentoId {
 		return borrador, nil // Reintento de asociación, sin nueva actuación.
 	}
+	ahora := utils.HoraBogota()
 	if anterior != nil {
-		if _, err := tx.Raw(`UPDATE paz_y_salvos.soporte_solicitud_grado SET activo=false, fecha_modificacion=now() WHERE id=?`, anterior.Id).Exec(); err != nil {
+		if _, err := tx.Raw(`UPDATE paz_y_salvos.soporte_solicitud_grado SET activo=false, fecha_modificacion=? WHERE id=?`, ahora, anterior.Id).Exec(); err != nil {
 			return nil, err
 		}
 	}
 	var soporte models.SoporteGrado
 	if err := tx.Raw(`INSERT INTO paz_y_salvos.soporte_solicitud_grado
-		(solicitud_grado_id, formulario_solicitud_grado_id, documento_id, tipo_documento_id, soporte_anterior_id)
-		VALUES (?, ?, ?, ?, NULLIF(?, 0)) RETURNING *`, id, entrada.FormularioId, entrada.DocumentoId, tipoID, actual).QueryRow(&soporte); err != nil {
+		(solicitud_grado_id, formulario_solicitud_grado_id, documento_id, tipo_documento_id, soporte_anterior_id,
+		 fecha_creacion, fecha_modificacion)
+		VALUES (?, ?, ?, ?, NULLIF(?, 0), ?, ?) RETURNING *`, id, entrada.FormularioId, entrada.DocumentoId, tipoID, actual, ahora, ahora).QueryRow(&soporte); err != nil {
 		return nil, err
 	}
 	if _, err := tx.Raw(`INSERT INTO paz_y_salvos.historial_soporte_solicitud_grado
-		(soporte_solicitud_grado_id, tercero_id, estado_soporte_id, observacion)
-		VALUES (?, ?, ?, 'Soporte provisional cargado por el estudiante')`, soporte.Id, terceroID, entrada.EstadoSoporteId).Exec(); err != nil {
+		(soporte_solicitud_grado_id, tercero_id, estado_soporte_id, observacion, fecha_creacion, fecha_modificacion)
+		VALUES (?, ?, ?, 'Soporte provisional cargado por el estudiante', ?, ?)`, soporte.Id, terceroID, entrada.EstadoSoporteId, ahora, ahora).Exec(); err != nil {
 		return nil, err
 	}
 	if err := cargarBorrador(tx, borrador, estadoBorradorID); err != nil {

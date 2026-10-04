@@ -31,9 +31,9 @@ BEGIN
         EXECUTE format('COMMENT ON COLUMN paz_y_salvos.%I.activo IS %L', tabla,
             'Indicador de vigencia lógica del registro. No representa aprobación ni sustituye el estado funcional del proceso.');
         EXECUTE format('COMMENT ON COLUMN paz_y_salvos.%I.fecha_creacion IS %L', tabla,
-            'Fecha y hora de creación del registro. Usa timestamp sin zona horaria; mantener una convención institucional coherente.');
+            'Fecha y hora de creación del registro en hora de Bogotá, almacenada como timestamp sin zona horaria según la convención OAS.');
         EXECUTE format('COMMENT ON COLUMN paz_y_salvos.%I.fecha_modificacion IS %L', tabla,
-            'Fecha y hora de la última modificación; inicialmente igual a fecha_creacion. El servicio debe actualizarla en cada modificación.');
+            'Fecha y hora de Bogotá de la última modificación; inicialmente igual a fecha_creacion. El servicio debe actualizarla en cada modificación.');
     END LOOP;
 END;
 $$;
@@ -62,7 +62,7 @@ COMMENT ON COLUMN paz_y_salvos.formulario_solicitud_grado.version IS
 COMMENT ON COLUMN paz_y_salvos.formulario_solicitud_grado.contenido IS
     'Objeto JSON con los datos variables del formulario, incluida la identificación documental del director consultado en otra fuente. El MID valida estructura y campos obligatorios según el contrato funcional.';
 COMMENT ON COLUMN paz_y_salvos.formulario_solicitud_grado.fecha_radicacion IS
-    'Fecha del servidor al enviar esta versión; NULL indica borrador. Solo se admite un borrador activo por solicitud. El backend debe impedir sobrescribir el contenido radicado y crear una nueva versión para subsanar.';
+    'Fecha y hora de Bogotá al enviar esta versión; NULL indica borrador. Solo se admite un borrador activo por solicitud. El backend debe impedir sobrescribir el contenido radicado y crear una nueva versión para subsanar.';
 
 COMMENT ON COLUMN paz_y_salvos.soporte_solicitud_grado.solicitud_grado_id IS
     'Llave foránea a la solicitud propietaria del soporte; debe coincidir con la solicitud del formulario y del soporte anterior.';
