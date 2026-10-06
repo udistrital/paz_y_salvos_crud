@@ -5,6 +5,7 @@ import (
 
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/udistrital/paz_y_salvos_crud/models"
+	"github.com/udistrital/paz_y_salvos_crud/utils"
 )
 
 // PatchSemaforoWithValidation aplica un PATCH con bloqueo de fila para que la
@@ -41,6 +42,8 @@ func PatchSemaforoWithValidation(id int, patch models.SemaforoPatch) error {
 		tx.Rollback()
 		return errors.New("No se enviaron campos para actualizar")
 	}
+	currentRecord.FechaModificacion = utils.HoraBogota()
+	columns = append(columns, "FechaModificacion")
 	if _, err = tx.Update(currentRecord, columns...); err != nil {
 		tx.Rollback()
 		return err

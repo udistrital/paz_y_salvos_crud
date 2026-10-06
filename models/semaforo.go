@@ -7,6 +7,7 @@ import (
 
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/udistrital/paz_y_salvos_crud/utils"
 )
 
 type Semaforo struct {
@@ -33,8 +34,8 @@ type Semaforo struct {
 	ObservacionOrc          string    `orm:"column(observacion_orc);null"`
 	ObservacionFinanciera   string    `orm:"column(observacion_financiera);null"`
 	Activo                  bool      `orm:"column(activo);null"`
-	FechaCreacion           time.Time `orm:"auto_now_add;column(fecha_creacion);type(timestamp without time zone)"`
-	FechaModificacion       time.Time `orm:"auto_now;column(fecha_modificacion);type(timestamp without time zone)"`
+	FechaCreacion           time.Time `orm:"column(fecha_creacion);type(timestamp without time zone)"`
+	FechaModificacion       time.Time `orm:"column(fecha_modificacion);type(timestamp without time zone)"`
 }
 
 func (t *Semaforo) TableName() string {
@@ -49,6 +50,9 @@ func init() {
 // last inserted Id on success.
 func AddSemaforo(m *Semaforo) (id int64, err error) {
 	o := orm.NewOrm()
+	ahora := utils.HoraBogota()
+	m.FechaCreacion = ahora
+	m.FechaModificacion = ahora
 	id, err = o.Insert(m)
 	return
 }
@@ -153,6 +157,8 @@ func UpdateSemaforoById(m *Semaforo) (err error) {
 	v := Semaforo{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
+		m.FechaCreacion = v.FechaCreacion
+		m.FechaModificacion = utils.HoraBogota()
 		var num int64
 		if num, err = o.Update(m); err == nil {
 			logs.Info("Number of records updated in database:", num)
