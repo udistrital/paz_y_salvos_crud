@@ -7,11 +7,13 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/udistrital/paz_y_salvos_crud/helpers"
 	"github.com/udistrital/paz_y_salvos_crud/models"
+	"github.com/udistrital/paz_y_salvos_crud/repositories"
 	"github.com/udistrital/paz_y_salvos_crud/services"
 )
 
@@ -65,33 +67,23 @@ func (c *InscripcionGradoController) ConsultarBorrador() {
 	terceroID, e1 := c.GetInt("tercero_id")
 	periodoID, e2 := c.GetInt("periodo_id")
 	programaID, e3 := c.GetInt("programa_id")
-	estadoID, e4 := c.GetInt("estado_borrador_id")
-	estadoRadicadaID, e5 := parametroEnteroOpcional(c, "estado_radicada_id")
-	if e1 != nil || e2 != nil || e3 != nil || e4 != nil || e5 != nil {
+	estados, e4 := idsConsultaRevision(c.GetString("estados"))
+	if e1 != nil || e2 != nil || e3 != nil || e4 != nil {
 		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Identificadores inválidos")
 		return
 	}
-	c.responderBorrador(services.ConsultarBorradorInscripcionGrado(terceroID, periodoID, programaID, estadoID, estadoRadicadaID))
+	c.responderBorrador(services.ConsultarBorradorInscripcionGrado(terceroID, periodoID, programaID, estados...))
 }
 
 func (c *InscripcionGradoController) ConsultarBorradorPorID() {
 	id, err := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	terceroID, e2 := c.GetInt("tercero_id")
-	estadoID, e3 := c.GetInt("estado_borrador_id")
-	estadoRadicadaID, e4 := parametroEnteroOpcional(c, "estado_radicada_id")
-	if err != nil || e2 != nil || e3 != nil || e4 != nil {
+	estados, e3 := idsConsultaRevision(c.GetString("estados"))
+	if err != nil || e2 != nil || e3 != nil {
 		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Identificadores inválidos")
 		return
 	}
-	c.responderBorrador(services.ConsultarBorradorPorID(id, terceroID, estadoID, estadoRadicadaID))
-}
-
-func parametroEnteroOpcional(c *InscripcionGradoController, nombre string) (int, error) {
-	valor := c.GetString(nombre)
-	if valor == "" {
-		return 0, nil
-	}
-	return strconv.Atoi(valor)
+	c.responderBorrador(services.ConsultarBorradorPorID(id, terceroID, estados...))
 }
 
 func (c *InscripcionGradoController) ActualizarBorrador() {
@@ -125,6 +117,20 @@ func (c *InscripcionGradoController) AsociarSoporte() {
 	c.responderBorrador(services.AsociarSoporteBorrador(id, tercero, estado, tipo, entrada))
 }
 
+func (c *InscripcionGradoController) EliminarSoporte() {
+	id, e1 := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	tipo, e2 := strconv.Atoi(c.Ctx.Input.Param(":tipo"))
+	tercero, e3 := c.GetInt("tercero_id")
+	estado, e4 := c.GetInt("estado_borrador_id")
+	formulario, e5 := c.GetInt("formulario_id")
+	soporte, e6 := c.GetInt("soporte_actual_id")
+	if e1 != nil || e2 != nil || e3 != nil || e4 != nil || e5 != nil || e6 != nil {
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Identificadores inválidos")
+		return
+	}
+	c.responderBorrador(services.EliminarSoporteBorrador(id, tercero, estado, tipo, formulario, soporte))
+}
+
 func (c *InscripcionGradoController) Radicar() {
 	id, e1 := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	tercero, e2 := c.GetInt("tercero_id")
@@ -152,6 +158,100 @@ func (c *InscripcionGradoController) Radicar() {
 		return
 	}
 	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Inscripción radicada", Data: resultado})
+}
+
+func (c *InscripcionGradoController) Subsanar() {
+	id, e1 := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	tercero, e2 := c.GetInt("tercero_id")
+	if e1 != nil || e2 != nil {
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Identificadores inválidos")
+		return
+	}
+	var entrada models.SubsanarInscripcionGrado
+	if !c.leerJSON(&entrada) {
+		return
+	}
+	c.responderBorrador(services.SubsanarInscripcionGrado(id, tercero, entrada))
+}
+
+func idsConsultaRevision(valor string) ([]int, error) {
+	partes := strings.Split(valor, ",")
+	ids := make([]int, 0, len(partes))
+	vistos := make(map[int]bool, len(partes))
+	for _, parte := range partes {
+		id, err := strconv.Atoi(strings.TrimSpace(parte))
+		if err != nil || id <= 0 || vistos[id] {
+			return nil, services.ErrRevisionDocumentalInvalida
+		}
+		vistos[id] = true
+		ids = append(ids, id)
+	}
+	if len(ids) == 0 {
+		return nil, services.ErrRevisionDocumentalInvalida
+	}
+	return ids, nil
+}
+
+func (c *InscripcionGradoController) ListarRevisionDocumental() {
+	dependencia, errDependencia := c.GetInt("dependencia_id")
+	estados, errEstados := idsConsultaRevision(c.GetString("estados"))
+	limit, errLimit := c.GetInt("limit", 20)
+	offset, errOffset := c.GetInt("offset", 0)
+	periodo, errPeriodo := c.GetInt("periodo_id", 0)
+	programa, errPrograma := c.GetInt("programa_id", 0)
+	if errDependencia != nil || errEstados != nil || errLimit != nil || errOffset != nil || errPeriodo != nil || errPrograma != nil {
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Filtros de revisión inválidos")
+		return
+	}
+	resultado, err := services.ListarSolicitudesRevisionGrado(repositories.NuevaRevisionDocumentalORM(), dependencia, estados, limit, offset, periodo, programa)
+	if err != nil {
+		c.responderRevision(nil, err)
+		return
+	}
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Solicitudes para revisión", Data: resultado})
+}
+
+func (c *InscripcionGradoController) ConsultarRevisionDocumental() {
+	id, errID := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	dependencia, errDependencia := c.GetInt("dependencia_id")
+	estados, errEstados := idsConsultaRevision(c.GetString("estados"))
+	if errID != nil || errDependencia != nil || errEstados != nil {
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Identificadores de revisión inválidos")
+		return
+	}
+	c.responderRevision(services.ConsultarSolicitudRevisionGrado(repositories.NuevaRevisionDocumentalORM(), id, dependencia, estados))
+}
+
+func (c *InscripcionGradoController) RevisarDocumentacion() {
+	id, errID := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	dependencia, errDependencia := c.GetInt("dependencia_id")
+	if errID != nil || errDependencia != nil {
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Identificadores de revisión inválidos")
+		return
+	}
+	var entrada models.RevisarDocumentacionGrado
+	if !c.leerJSON(&entrada) {
+		return
+	}
+	c.responderRevision(services.RevisarDocumentacionGrado(repositories.NuevaRevisionDocumentalORM(), id, dependencia, entrada))
+}
+
+func (c *InscripcionGradoController) responderRevision(resultado *models.BorradorInscripcionGrado, err error) {
+	if err != nil {
+		logs.Error(err)
+		switch {
+		case errors.Is(err, services.ErrRevisionDocumentalInvalida):
+			helpers.RenderError(&c.Controller, http.StatusBadRequest, err.Error())
+		case errors.Is(err, services.ErrSolicitudFueraAlcance), errors.Is(err, services.ErrBorradorNoEncontrado):
+			helpers.RenderError(&c.Controller, http.StatusNotFound, "Solicitud no encontrada en el alcance autorizado")
+		case errors.Is(err, services.ErrBorradorCerrado):
+			helpers.RenderError(&c.Controller, http.StatusConflict, "La solicitud cambió de estado o versión")
+		default:
+			helpers.RenderError(&c.Controller, http.StatusInternalServerError, "No se pudo procesar la revisión documental")
+		}
+		return
+	}
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Revisión documental registrada", Data: resultado})
 }
 
 func (c *InscripcionGradoController) responderBorrador(resultado *models.BorradorInscripcionGrado, err error) {

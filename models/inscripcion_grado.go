@@ -32,8 +32,32 @@ type RadicarInscripcionGrado struct {
 	TiposSoporteId           []int           `json:"TiposSoporteId"`
 }
 
+type SubsanarInscripcionGrado struct {
+	FormularioId             int `json:"FormularioId"`
+	EstadoObservadaId        int `json:"EstadoObservadaId"`
+	EstadoBorradorId         int `json:"EstadoBorradorId"`
+	EstadoSoportePendienteId int `json:"EstadoSoportePendienteId"`
+}
+
+// RevisarDocumentacionGrado recibe exclusivamente IDs ya resueltos por el MID.
+// El CRUD vuelve a comprobar estado, versión, soportes y atomicidad.
+type RevisarDocumentacionGrado struct {
+	FormularioId                  int                    `json:"FormularioId"`
+	TerceroId                     int                    `json:"TerceroId"`
+	Aprobada                      bool                   `json:"Aprobada"`
+	Justificacion                 string                 `json:"Justificacion"`
+	EstadoRadicadaId              int                    `json:"EstadoRadicadaId"`
+	EstadoObservadaId             int                    `json:"EstadoObservadaId"`
+	EstadoDocumentacionAprobadaId int                    `json:"EstadoDocumentacionAprobadaId"`
+	EstadoSoporteObservadoId      int                    `json:"EstadoSoporteObservadoId"`
+	EstadoSoporteAprobadoId       int                    `json:"EstadoSoporteAprobadoId"`
+	EstadoPazSalvoPendienteId     int                    `json:"EstadoPazSalvoPendienteId"`
+	TiposPazSalvoId               []int                  `json:"TiposPazSalvoId"`
+	Soportes                      []DecisionSoporteGrado `json:"Soportes"`
+}
+
 type SolicitudGrado struct {
-	Id                            int       `json:"Id" orm:"column(id)"`
+	Id                            int       `json:"Id" orm:"column(id);pk;auto"`
 	TerceroId                     int       `json:"TerceroId" orm:"column(tercero_id)"`
 	CodigoEstudiante              string    `json:"CodigoEstudiante" orm:"column(codigo_estudiante)"`
 	PeriodoId                     int       `json:"PeriodoId" orm:"column(periodo_id)"`
@@ -47,7 +71,7 @@ type SolicitudGrado struct {
 }
 
 type FormularioSolicitudGrado struct {
-	Id                int             `json:"Id" orm:"column(id)"`
+	Id                int             `json:"Id" orm:"column(id);pk;auto"`
 	SolicitudGradoId  int             `json:"SolicitudGradoId" orm:"column(solicitud_grado_id)"`
 	Version           int16           `json:"Version" orm:"column(version)"`
 	Contenido         json.RawMessage `json:"Contenido" orm:"column(contenido);type(json)"`
@@ -58,7 +82,7 @@ type FormularioSolicitudGrado struct {
 }
 
 type HistorialSolicitudGrado struct {
-	Id                         int       `json:"Id" orm:"column(id)"`
+	Id                         int       `json:"Id" orm:"column(id);pk;auto"`
 	SolicitudGradoId           int       `json:"SolicitudGradoId" orm:"column(solicitud_grado_id)"`
 	FormularioSolicitudGradoId *int      `json:"FormularioSolicitudGradoId" orm:"column(formulario_solicitud_grado_id);null"`
 	TerceroId                  int       `json:"TerceroId" orm:"column(tercero_id)"`
@@ -70,8 +94,13 @@ type HistorialSolicitudGrado struct {
 }
 
 type BorradorInscripcionGrado struct {
-	Solicitud  SolicitudGrado           `json:"Solicitud"`
-	Formulario FormularioSolicitudGrado `json:"Formulario"`
-	Historial  HistorialSolicitudGrado  `json:"Historial"`
-	Soportes   []SoporteGrado           `json:"Soportes"`
+	Solicitud       SolicitudGrado           `json:"Solicitud"`
+	Formulario      FormularioSolicitudGrado `json:"Formulario"`
+	Historial       HistorialSolicitudGrado  `json:"Historial"`
+	Soportes        []SoporteGrado           `json:"Soportes"`
+	EstadosSoportes []HistorialSoporteGrado  `json:"EstadosSoportes"`
 }
+
+func (SolicitudGrado) TableName() string           { return "solicitud_grado" }
+func (FormularioSolicitudGrado) TableName() string { return "formulario_solicitud_grado" }
+func (HistorialSolicitudGrado) TableName() string  { return "historial_solicitud_grado" }

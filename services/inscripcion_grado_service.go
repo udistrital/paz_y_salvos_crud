@@ -154,8 +154,8 @@ func contenidoBorradorValido(contenido json.RawMessage) bool {
 
 // ConsultarBorradorInscripcionGrado filtra por el propietario y los estados
 // comprobados por el MID. Nunca devuelve expedientes de otro estudiante.
-func ConsultarBorradorInscripcionGrado(terceroID, periodoID, programaID, estadoBorradorID, estadoRadicadaID int) (*models.BorradorInscripcionGrado, error) {
-	if terceroID <= 0 || periodoID <= 0 || programaID <= 0 || estadoBorradorID <= 0 {
+func ConsultarBorradorInscripcionGrado(terceroID, periodoID, programaID int, estadosPermitidos ...int) (*models.BorradorInscripcionGrado, error) {
+	if terceroID <= 0 || periodoID <= 0 || programaID <= 0 || !estadosConsultaValidos(estadosPermitidos) {
 		return nil, ErrBorradorInvalido
 	}
 	o := orm.NewOrm()
@@ -168,14 +168,14 @@ func ConsultarBorradorInscripcionGrado(terceroID, periodoID, programaID, estadoB
 		}
 		return nil, err
 	}
-	if err := cargarSolicitudConsultable(o, resultado, estadoBorradorID, estadoRadicadaID); err != nil {
+	if err := cargarSolicitudConsultable(o, resultado, estadosPermitidos...); err != nil {
 		return nil, err
 	}
 	return resultado, nil
 }
 
-func ConsultarBorradorPorID(id, terceroID, estadoBorradorID, estadoRadicadaID int) (*models.BorradorInscripcionGrado, error) {
-	if id <= 0 || terceroID <= 0 || estadoBorradorID <= 0 {
+func ConsultarBorradorPorID(id, terceroID int, estadosPermitidos ...int) (*models.BorradorInscripcionGrado, error) {
+	if id <= 0 || terceroID <= 0 || !estadosConsultaValidos(estadosPermitidos) {
 		return nil, ErrBorradorInvalido
 	}
 	o := orm.NewOrm()
@@ -187,10 +187,24 @@ func ConsultarBorradorPorID(id, terceroID, estadoBorradorID, estadoRadicadaID in
 		}
 		return nil, err
 	}
-	if err := cargarSolicitudConsultable(o, resultado, estadoBorradorID, estadoRadicadaID); err != nil {
+	if err := cargarSolicitudConsultable(o, resultado, estadosPermitidos...); err != nil {
 		return nil, err
 	}
 	return resultado, nil
+}
+
+func estadosConsultaValidos(estados []int) bool {
+	if len(estados) == 0 {
+		return false
+	}
+	vistos := make(map[int]bool, len(estados))
+	for _, estado := range estados {
+		if estado <= 0 || vistos[estado] {
+			return false
+		}
+		vistos[estado] = true
+	}
+	return true
 }
 
 func cargarBorrador(o orm.QueryExecutor, resultado *models.BorradorInscripcionGrado, estadoBorradorID int) error {
@@ -203,16 +217,15 @@ func cargarBorrador(o orm.QueryExecutor, resultado *models.BorradorInscripcionGr
 	return nil
 }
 
-func cargarSolicitudConsultable(o orm.QueryExecutor, resultado *models.BorradorInscripcionGrado, estadoBorradorID, estadoRadicadaID int) error {
-	estados := []int{estadoBorradorID}
-	if estadoRadicadaID > 0 && estadoRadicadaID != estadoBorradorID {
-		estados = append(estados, estadoRadicadaID)
+func cargarSolicitudConsultable(o orm.QueryExecutor, resultado *models.BorradorInscripcionGrado, estadosPermitidos ...int) error {
+	if len(estadosPermitidos) == 0 {
+		return ErrBorradorInvalido
 	}
-	if err := cargarSolicitud(o, resultado, estados...); err != nil {
+	if err := cargarSolicitud(o, resultado, estadosPermitidos...); err != nil {
 		return err
 	}
-	esRadicada := resultado.Historial.EstadoSolicitudId == estadoRadicadaID
-	if (esRadicada && resultado.Formulario.FechaRadicacion == nil) || (!esRadicada && resultado.Formulario.FechaRadicacion != nil) {
+	esBorrador := resultado.Historial.EstadoSolicitudId == estadosPermitidos[0]
+	if (esBorrador && resultado.Formulario.FechaRadicacion != nil) || (!esBorrador && resultado.Formulario.FechaRadicacion == nil) {
 		return ErrBorradorCerrado
 	}
 	return nil
@@ -228,7 +241,7 @@ func cargarSolicitud(o orm.QueryExecutor, resultado *models.BorradorInscripcionG
 		return err
 	}
 	if err := o.Raw(`SELECT * FROM paz_y_salvos.historial_solicitud_grado
-		WHERE solicitud_grado_id=? AND activo ORDER BY fecha_creacion DESC, id DESC LIMIT 1`,
+		WHERE solicitud_grado_id=? AND activo ORDER BY id DESC LIMIT 1`,
 		resultado.Solicitud.Id).QueryRow(&resultado.Historial); err != nil {
 		if errors.Is(err, orm.ErrNoRows) {
 			return ErrBorradorCerrado
@@ -253,7 +266,109 @@ func cargarSolicitud(o orm.QueryExecutor, resultado *models.BorradorInscripcionG
 	_, err := o.Raw(`SELECT * FROM paz_y_salvos.soporte_solicitud_grado
 		WHERE solicitud_grado_id=? AND formulario_solicitud_grado_id=? AND activo ORDER BY tipo_documento_id`,
 		resultado.Solicitud.Id, resultado.Formulario.Id).QueryRows(&resultado.Soportes)
+	if err != nil {
+		return err
+	}
+	resultado.EstadosSoportes = []models.HistorialSoporteGrado{}
+	_, err = o.Raw(`SELECT DISTINCT ON (h.soporte_solicitud_grado_id) h.*
+		FROM paz_y_salvos.historial_soporte_solicitud_grado h
+		JOIN paz_y_salvos.soporte_solicitud_grado s ON s.id=h.soporte_solicitud_grado_id
+		WHERE s.solicitud_grado_id=? AND s.formulario_solicitud_grado_id=? AND s.activo AND h.activo
+		ORDER BY h.soporte_solicitud_grado_id, h.id DESC`,
+		resultado.Solicitud.Id, resultado.Formulario.Id).QueryRows(&resultado.EstadosSoportes)
 	return err
+}
+
+func SubsanarInscripcionGrado(id, terceroID int, entrada models.SubsanarInscripcionGrado) (*models.BorradorInscripcionGrado, error) {
+	if id <= 0 || terceroID <= 0 || entrada.FormularioId <= 0 || entrada.EstadoObservadaId <= 0 ||
+		entrada.EstadoBorradorId <= 0 || entrada.EstadoSoportePendienteId <= 0 {
+		return nil, ErrBorradorInvalido
+	}
+	tx, err := orm.NewOrm().Begin()
+	if err != nil {
+		return nil, err
+	}
+	rollback := func(cause error) (*models.BorradorInscripcionGrado, error) {
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			return nil, fmt.Errorf("%w; revertir subsanación: %v", cause, rollbackErr)
+		}
+		return nil, cause
+	}
+	var solicitud models.SolicitudGrado
+	if err := tx.Raw(`SELECT * FROM paz_y_salvos.solicitud_grado WHERE id=? AND tercero_id=? AND activo FOR UPDATE`, id, terceroID).QueryRow(&solicitud); err != nil {
+		if errors.Is(err, orm.ErrNoRows) {
+			return rollback(ErrBorradorNoEncontrado)
+		}
+		return rollback(err)
+	}
+	actual := &models.BorradorInscripcionGrado{Solicitud: solicitud}
+	if err := cargarSolicitud(tx, actual, entrada.EstadoObservadaId); err != nil {
+		return rollback(err)
+	}
+	if actual.Formulario.Id != entrada.FormularioId || actual.Formulario.FechaRadicacion == nil ||
+		len(actual.Soportes) < 3 || len(actual.Soportes) > 4 {
+		return rollback(ErrBorradorCerrado)
+	}
+	ahora := utils.HoraBogota()
+	resultado := &models.BorradorInscripcionGrado{Solicitud: solicitud, Soportes: make([]models.SoporteGrado, 0, len(actual.Soportes)),
+		EstadosSoportes: make([]models.HistorialSoporteGrado, 0, len(actual.Soportes))}
+	if err := tx.Raw(`INSERT INTO paz_y_salvos.formulario_solicitud_grado
+		(solicitud_grado_id, version, contenido, fecha_creacion, fecha_modificacion)
+		VALUES (?, ?, ?::jsonb, ?, ?) RETURNING *`, id, actual.Formulario.Version+1,
+		string(actual.Formulario.Contenido), ahora, ahora).QueryRow(&resultado.Formulario); err != nil {
+		return rollback(err)
+	}
+	for _, anterior := range actual.Soportes {
+		observacion := "Soporte heredado para subsanación"
+		for _, estadoAnterior := range actual.EstadosSoportes {
+			if estadoAnterior.SoporteGradoId == anterior.Id && strings.TrimSpace(estadoAnterior.Observacion) != "" {
+				observacion = estadoAnterior.Observacion
+				break
+			}
+		}
+		var soporte models.SoporteGrado
+		if err := tx.Raw(`INSERT INTO paz_y_salvos.soporte_solicitud_grado
+			(solicitud_grado_id, formulario_solicitud_grado_id, documento_id, tipo_documento_id, soporte_anterior_id, fecha_creacion, fecha_modificacion)
+			VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *`, id, resultado.Formulario.Id, anterior.DocumentoId,
+			anterior.TipoDocumentoId, anterior.Id, ahora, ahora).QueryRow(&soporte); err != nil {
+			return rollback(err)
+		}
+		historialSoporte := models.HistorialSoporteGrado{SoporteGradoId: soporte.Id, TerceroId: terceroID,
+			EstadoSoporteId: entrada.EstadoSoportePendienteId, Observacion: observacion, Activo: true,
+			FechaCreacion: ahora, FechaModificacion: ahora}
+		if err := tx.Raw(`INSERT INTO paz_y_salvos.historial_soporte_solicitud_grado
+			(soporte_solicitud_grado_id, tercero_id, estado_soporte_id, observacion, activo, fecha_creacion, fecha_modificacion)
+			VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *`, historialSoporte.SoporteGradoId, historialSoporte.TerceroId,
+			historialSoporte.EstadoSoporteId, historialSoporte.Observacion, historialSoporte.Activo,
+			historialSoporte.FechaCreacion, historialSoporte.FechaModificacion).QueryRow(&historialSoporte); err != nil {
+			return rollback(err)
+		}
+		resultado.Soportes = append(resultado.Soportes, soporte)
+		resultado.EstadosSoportes = append(resultado.EstadosSoportes, historialSoporte)
+	}
+	formularioID := resultado.Formulario.Id
+	justificacion := "Subsanación iniciada por el estudiante"
+	resultado.Historial = models.HistorialSolicitudGrado{SolicitudGradoId: id, FormularioSolicitudGradoId: &formularioID,
+		TerceroId: terceroID, EstadoSolicitudId: entrada.EstadoBorradorId, Justificacion: &justificacion, Activo: true,
+		FechaCreacion: ahora, FechaModificacion: ahora}
+	if err := tx.Raw(`INSERT INTO paz_y_salvos.historial_solicitud_grado
+		(solicitud_grado_id, formulario_solicitud_grado_id, tercero_id, estado_solicitud_id, justificacion, activo, fecha_creacion, fecha_modificacion)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`, resultado.Historial.SolicitudGradoId,
+		resultado.Historial.FormularioSolicitudGradoId, resultado.Historial.TerceroId, resultado.Historial.EstadoSolicitudId,
+		resultado.Historial.Justificacion, resultado.Historial.Activo, resultado.Historial.FechaCreacion,
+		resultado.Historial.FechaModificacion).QueryRow(&resultado.Historial); err != nil {
+		return rollback(err)
+	}
+	if _, err := tx.Raw(`UPDATE paz_y_salvos.solicitud_grado SET fecha_modificacion=? WHERE id=? AND activo`, ahora, id).Exec(); err != nil {
+		return rollback(err)
+	}
+	if err := cargarContenidoFormulario(tx, &resultado.Formulario); err != nil {
+		return rollback(err)
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	return resultado, nil
 }
 
 func cargarContenidoFormulario(o orm.QueryExecutor, formulario *models.FormularioSolicitudGrado) error {

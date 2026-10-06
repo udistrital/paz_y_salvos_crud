@@ -84,3 +84,54 @@ func AsociarSoporteBorrador(id, terceroID, estadoBorradorID, tipoID int, entrada
 	}
 	return borrador, nil
 }
+
+// EliminarSoporteBorrador desactiva la asociación vigente sin eliminar el
+// documento ni las actuaciones que conforman su trazabilidad.
+func EliminarSoporteBorrador(id, terceroID, estadoBorradorID, tipoID, formularioID, soporteActualID int) (*models.BorradorInscripcionGrado, error) {
+	if id <= 0 || terceroID <= 0 || estadoBorradorID <= 0 || tipoID <= 0 || formularioID <= 0 || soporteActualID <= 0 {
+		return nil, ErrBorradorInvalido
+	}
+	tx, err := orm.NewOrm().Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+	borrador := &models.BorradorInscripcionGrado{}
+	if err := tx.Raw(`SELECT * FROM paz_y_salvos.solicitud_grado WHERE id=? AND tercero_id=? AND activo FOR UPDATE`,
+		id, terceroID).QueryRow(&borrador.Solicitud); err != nil {
+		if errors.Is(err, orm.ErrNoRows) {
+			return nil, ErrBorradorNoEncontrado
+		}
+		return nil, err
+	}
+	if err := cargarBorrador(tx, borrador, estadoBorradorID); err != nil {
+		return nil, err
+	}
+	if borrador.Formulario.Id != formularioID {
+		return nil, ErrBorradorCerrado
+	}
+	var actual *models.SoporteGrado
+	for i := range borrador.Soportes {
+		if borrador.Soportes[i].TipoDocumentoId != tipoID {
+			continue
+		}
+		if actual != nil {
+			return nil, ErrBorradorCerrado
+		}
+		actual = &borrador.Soportes[i]
+	}
+	if actual == nil || actual.Id != soporteActualID || actual.FormularioSolicitudGradoId != formularioID {
+		return nil, ErrBorradorCerrado
+	}
+	if _, err := tx.Raw(`UPDATE paz_y_salvos.soporte_solicitud_grado SET activo=false, fecha_modificacion=? WHERE id=? AND activo`,
+		utils.HoraBogota(), actual.Id).Exec(); err != nil {
+		return nil, err
+	}
+	if err := cargarBorrador(tx, borrador, estadoBorradorID); err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	return borrador, nil
+}
