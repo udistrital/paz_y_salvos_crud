@@ -41,23 +41,54 @@ type HistorialSoporteGrado struct {
 }
 
 type PazSalvoGrado struct {
-	Id                int       `orm:"column(id);pk;auto"`
-	SolicitudGradoId  int       `orm:"column(solicitud_grado_id)"`
-	TipoPazSalvoId    int       `orm:"column(tipo_paz_salvo_id)"`
-	Activo            bool      `orm:"column(activo)"`
-	FechaCreacion     time.Time `orm:"column(fecha_creacion);type(timestamp without time zone)"`
-	FechaModificacion time.Time `orm:"column(fecha_modificacion);type(timestamp without time zone)"`
+	Id                int       `json:"Id" orm:"column(id);pk;auto"`
+	SolicitudGradoId  int       `json:"SolicitudGradoId" orm:"column(solicitud_grado_id)"`
+	TipoPazSalvoId    int       `json:"TipoPazSalvoId" orm:"column(tipo_paz_salvo_id)"`
+	Activo            bool      `json:"Activo" orm:"column(activo)"`
+	FechaCreacion     time.Time `json:"FechaCreacion" orm:"column(fecha_creacion);type(timestamp without time zone)"`
+	FechaModificacion time.Time `json:"FechaModificacion" orm:"column(fecha_modificacion);type(timestamp without time zone)"`
 }
 
 type HistorialPazSalvoGrado struct {
-	Id                int       `orm:"column(id);pk;auto"`
-	PazSalvoId        int       `orm:"column(paz_salvo_id)"`
-	TerceroId         int       `orm:"column(tercero_id)"`
-	EstadoPazSalvoId  int       `orm:"column(estado_paz_salvo_id)"`
-	Justificacion     string    `orm:"column(justificacion);null"`
-	Activo            bool      `orm:"column(activo)"`
-	FechaCreacion     time.Time `orm:"column(fecha_creacion);type(timestamp without time zone)"`
-	FechaModificacion time.Time `orm:"column(fecha_modificacion);type(timestamp without time zone)"`
+	Id                int       `json:"Id" orm:"column(id);pk;auto"`
+	PazSalvoId        int       `json:"PazSalvoId" orm:"column(paz_salvo_id)"`
+	TerceroId         int       `json:"TerceroId" orm:"column(tercero_id)"`
+	EstadoPazSalvoId  int       `json:"EstadoPazSalvoId" orm:"column(estado_paz_salvo_id)"`
+	Justificacion     string    `json:"Justificacion" orm:"column(justificacion);null"`
+	Activo            bool      `json:"Activo" orm:"column(activo)"`
+	FechaCreacion     time.Time `json:"FechaCreacion" orm:"column(fecha_creacion);type(timestamp without time zone)"`
+	FechaModificacion time.Time `json:"FechaModificacion" orm:"column(fecha_modificacion);type(timestamp without time zone)"`
+}
+
+type CheckPazSalvoGrado struct {
+	PazSalvo     PazSalvoGrado            `json:"PazSalvo"`
+	EstadoActual HistorialPazSalvoGrado   `json:"EstadoActual"`
+	Historial    []HistorialPazSalvoGrado `json:"Historial"`
+}
+
+type PazSalvosSolicitudGrado struct {
+	Solicitud SolicitudGrado       `json:"Solicitud"`
+	Checks    []CheckPazSalvoGrado `json:"Checks"`
+}
+
+type PaginaPazSalvosGrado struct {
+	Solicitudes []PazSalvosSolicitudGrado `json:"Solicitudes"`
+	Total       int                       `json:"Total"`
+}
+
+// DecidirPazSalvoGrado es un contrato interno: el MID resuelve los códigos de
+// Parámetros y el CRUD comprueba nuevamente el conjunto y la transición.
+type DecidirPazSalvoGrado struct {
+	TerceroId                     int    `json:"TerceroId"`
+	TipoPazSalvoId                int    `json:"TipoPazSalvoId"`
+	EstadoPazSalvoId              int    `json:"EstadoPazSalvoId"`
+	Justificacion                 string `json:"Justificacion"`
+	EstadoDocumentacionAprobadaId int    `json:"EstadoDocumentacionAprobadaId"`
+	EstadoPendienteId             int    `json:"EstadoPendienteId"`
+	EstadoAprobadoId              int    `json:"EstadoAprobadoId"`
+	EstadoDesaprobadoId           int    `json:"EstadoDesaprobadoId"`
+	TipoSecretariaId              int    `json:"TipoSecretariaId"`
+	TiposPreviosId                []int  `json:"TiposPreviosId"`
 }
 
 func (SoporteGrado) TableName() string           { return "soporte_solicitud_grado" }

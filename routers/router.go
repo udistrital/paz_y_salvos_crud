@@ -21,6 +21,8 @@ func init() {
 			),
 		),
 		beego.NSNamespace("/solicitud-grado",
+			beego.NSRouter("/paz-salvos", &controllers.InscripcionGradoController{}, "get:ListarPazSalvos"),
+			beego.NSRouter("/:id/paz-salvos", &controllers.InscripcionGradoController{}, "get:ConsultarPazSalvos;post:DecidirPazSalvo"),
 			beego.NSRouter("/revision", &controllers.InscripcionGradoController{}, "get:ListarRevisionDocumental"),
 			beego.NSRouter("/revision/:id", &controllers.InscripcionGradoController{}, "get:ConsultarRevisionDocumental;post:RevisarDocumentacion"),
 			beego.NSRouter("/borrador/:id/soportes/:tipo", &controllers.InscripcionGradoController{}, "put:AsociarSoporte;delete:EliminarSoporte"),

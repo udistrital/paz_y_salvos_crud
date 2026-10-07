@@ -236,6 +236,79 @@ func (c *InscripcionGradoController) RevisarDocumentacion() {
 	c.responderRevision(services.RevisarDocumentacionGrado(repositories.NuevaRevisionDocumentalORM(), id, dependencia, entrada))
 }
 
+func (c *InscripcionGradoController) ConsultarPazSalvos() {
+	id, errID := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	estado, errEstado := c.GetInt("estado_documentacion_aprobada_id")
+	tipos, errTipos := idsConsultaRevision(c.GetString("tipos"))
+	if errID != nil || errEstado != nil || errTipos != nil {
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Identificadores de Paz y Salvo inválidos")
+		return
+	}
+	c.responderPazSalvo(services.ConsultarPazSalvosGrado(repositories.NuevoPazSalvoGradoORM(), id, estado, tipos))
+}
+
+func (c *InscripcionGradoController) ListarPazSalvos() {
+	estado, errEstado := c.GetInt("estado_documentacion_aprobada_id")
+	tipos, errTipos := idsConsultaRevision(c.GetString("tipos"))
+	limit, errLimit := c.GetInt("limit", 20)
+	offset, errOffset := c.GetInt("offset", 0)
+	periodo, errPeriodo := c.GetInt("periodo_id", 0)
+	programa, errPrograma := c.GetInt("programa_id", 0)
+	tercero, errTercero := c.GetInt("tercero_id", 0)
+	var dependencias []int
+	var errDependencias error
+	if strings.TrimSpace(c.GetString("dependencias")) != "" {
+		dependencias, errDependencias = idsConsultaRevision(c.GetString("dependencias"))
+	}
+	if errEstado != nil || errTipos != nil || errLimit != nil || errOffset != nil || errPeriodo != nil || errPrograma != nil || errTercero != nil || errDependencias != nil {
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Filtros de Paz y Salvos inválidos")
+		return
+	}
+	resultado, err := services.ListarPazSalvosGrado(repositories.NuevoPazSalvoGradoORM(), estado, tipos, dependencias, limit, offset, periodo, programa, tercero, c.GetString("codigo"))
+	if err != nil {
+		if errors.Is(err, services.ErrPazSalvoGradoInvalido) {
+			helpers.RenderError(&c.Controller, http.StatusBadRequest, err.Error())
+			return
+		}
+		helpers.RenderError(&c.Controller, http.StatusInternalServerError, "No se pudo consultar la bandeja de Paz y Salvos")
+		return
+	}
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Bandeja de Paz y Salvos", Data: resultado})
+}
+
+func (c *InscripcionGradoController) DecidirPazSalvo() {
+	id, errID := strconv.Atoi(c.Ctx.Input.Param(":id"))
+	if errID != nil {
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Solicitud de Paz y Salvo inválida")
+		return
+	}
+	var entrada models.DecidirPazSalvoGrado
+	if !c.leerJSON(&entrada) {
+		return
+	}
+	c.responderPazSalvo(services.DecidirPazSalvoGrado(repositories.NuevoPazSalvoGradoORM(), id, entrada))
+}
+
+func (c *InscripcionGradoController) responderPazSalvo(resultado *models.PazSalvosSolicitudGrado, err error) {
+	if err != nil {
+		logs.Error(err)
+		switch {
+		case errors.Is(err, services.ErrPazSalvoGradoInvalido):
+			helpers.RenderError(&c.Controller, http.StatusBadRequest, err.Error())
+		case errors.Is(err, services.ErrPazSalvoGradoNoEncontrado):
+			helpers.RenderError(&c.Controller, http.StatusNotFound, err.Error())
+		case errors.Is(err, services.ErrPazSalvoGradoConflicto):
+			helpers.RenderError(&c.Controller, http.StatusConflict, err.Error())
+		default:
+			helpers.RenderError(&c.Controller, http.StatusInternalServerError, "No se pudo procesar el Paz y Salvo")
+		}
+		return
+	}
+	helpers.RenderResponse(&c.Controller, models.APIResponse{
+		Success: true, Status: http.StatusOK, Message: "Paz y Salvo procesado", Data: resultado,
+	})
+}
+
 func (c *InscripcionGradoController) responderRevision(resultado *models.BorradorInscripcionGrado, err error) {
 	if err != nil {
 		logs.Error(err)
