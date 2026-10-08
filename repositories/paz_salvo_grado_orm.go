@@ -155,23 +155,6 @@ func (r *PazSalvoGradoORM) Decidir(solicitudID int, entrada models.DecidirPazSal
 		check.EstadoActual.EstadoPazSalvoId == entrada.EstadoPazSalvoId {
 		return nil, services.ErrPazSalvoGradoConflicto
 	}
-	final := porTipo[entrada.TipoSecretariaId]
-	if entrada.TipoPazSalvoId == entrada.TipoSecretariaId {
-		if entrada.EstadoPazSalvoId == entrada.EstadoDesaprobadoId {
-			if final.EstadoActual.EstadoPazSalvoId != entrada.EstadoAprobadoId {
-				return nil, services.ErrPazSalvoGradoConflicto
-			}
-		} else {
-			for _, tipo := range entrada.TiposPreviosId {
-				previo, ok := porTipo[tipo]
-				if !ok || previo.EstadoActual.EstadoPazSalvoId != entrada.EstadoAprobadoId {
-					return nil, services.ErrPazSalvoGradoConflicto
-				}
-			}
-		}
-	} else if final.EstadoActual.EstadoPazSalvoId == entrada.EstadoAprobadoId {
-		return nil, services.ErrPazSalvoGradoConflicto
-	}
 	ahora := utils.HoraBogota()
 	historial := models.HistorialPazSalvoGrado{
 		PazSalvoId: check.PazSalvo.Id, TerceroId: entrada.TerceroId,
