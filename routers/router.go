@@ -1,6 +1,6 @@
 // @APIVersion 1.0.0
-// @Title beego Test API
-// @Description beego has a very cool tools to autogenerate documents for your API
+// @Title Paz y Salvos CRUD
+// @Description Persiste semáforos, solicitudes de grado y decisiones de Paz y Salvos
 // @Contact astaxie@gmail.com
 // @TermsOfServiceUrl http://beego.me/
 // @License Apache 2.0
@@ -21,6 +21,9 @@ func init() {
 			),
 		),
 		beego.NSNamespace("/solicitud-grado",
+			beego.NSRouter("/:id/versiones", &controllers.InscripcionGradoController{}, "get:ListarVersiones"),
+			beego.NSRouter("/:id/versiones/:numero", &controllers.InscripcionGradoController{}, "get:ConsultarVersion"),
+			beego.NSRouter("/paz-salvos/aprobados", &controllers.InscripcionGradoController{}, "get:ListarAprobadosSecretaria"),
 			beego.NSRouter("/paz-salvos", &controllers.InscripcionGradoController{}, "get:ListarPazSalvos"),
 			beego.NSRouter("/:id/paz-salvos", &controllers.InscripcionGradoController{}, "get:ConsultarPazSalvos;post:DecidirPazSalvo"),
 			beego.NSRouter("/revision", &controllers.InscripcionGradoController{}, "get:ListarRevisionDocumental"),

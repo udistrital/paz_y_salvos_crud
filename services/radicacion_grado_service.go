@@ -13,7 +13,7 @@ import (
 func RadicarInscripcionGrado(id, terceroID int, entrada models.RadicarInscripcionGrado) (*models.BorradorInscripcionGrado, error) {
 	if id <= 0 || terceroID <= 0 || entrada.FormularioId <= 0 || entrada.EstadoBorradorId <= 0 ||
 		entrada.EstadoRadicadaId <= 0 || entrada.EstadoRadicadaId == entrada.EstadoBorradorId ||
-		entrada.EstadoSoportePendienteId <= 0 || len(entrada.TiposSoporteId) < 3 || len(entrada.TiposSoporteId) > 4 ||
+		entrada.EstadoSoportePendienteId <= 0 || len(entrada.TiposSoporteId) == 0 ||
 		!contenidoRadicacionValido(entrada.Contenido) {
 		return nil, ErrRadicacionInvalida
 	}

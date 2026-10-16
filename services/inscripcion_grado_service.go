@@ -306,7 +306,7 @@ func SubsanarInscripcionGrado(id, terceroID int, entrada models.SubsanarInscripc
 		return rollback(err)
 	}
 	if actual.Formulario.Id != entrada.FormularioId || actual.Formulario.FechaRadicacion == nil ||
-		len(actual.Soportes) < 3 || len(actual.Soportes) > 4 {
+		len(actual.Soportes) == 0 {
 		return rollback(ErrBorradorCerrado)
 	}
 	ahora := utils.HoraBogota()
