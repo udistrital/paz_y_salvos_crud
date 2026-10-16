@@ -76,6 +76,23 @@ type PaginaPazSalvosGrado struct {
 	Total       int                       `json:"Total"`
 }
 
+// Solo los datos necesarios para que Diplomas identifique la solicitud cuyo
+// último estado de TPS_SECRETARIA es PS_APROBADO.
+type SolicitudAprobadaSecretariaGrado struct {
+	SolicitudId         int       `json:"SolicitudId" orm:"column(solicitud_id)"`
+	TerceroId           int       `json:"TerceroId" orm:"column(tercero_id)"`
+	CodigoEstudiante    string    `json:"CodigoEstudiante" orm:"column(codigo_estudiante)"`
+	PeriodoId           int       `json:"PeriodoId" orm:"column(periodo_id)"`
+	ProgramaAcademicoId int       `json:"ProgramaAcademicoId" orm:"column(programa_academico_id)"`
+	DependenciaOikosId  int       `json:"DependenciaOikosId" orm:"column(dependencia_oikos_id)"`
+	FechaAprobacion     time.Time `json:"FechaAprobacion" orm:"column(fecha_aprobacion)"`
+}
+
+type PaginaAprobadosSecretariaGrado struct {
+	Solicitudes []SolicitudAprobadaSecretariaGrado `json:"Solicitudes"`
+	Total       int                                `json:"Total"`
+}
+
 // DecidirPazSalvoGrado es un contrato interno: el MID resuelve los códigos de
 // Parámetros y el CRUD comprueba nuevamente el conjunto y la transición.
 type DecidirPazSalvoGrado struct {

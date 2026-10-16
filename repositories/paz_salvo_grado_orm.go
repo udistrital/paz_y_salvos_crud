@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"sort"
+	"strings"
 
 	"github.com/beego/beego/v2/client/orm"
 	"github.com/udistrital/paz_y_salvos_crud/models"
@@ -121,6 +122,51 @@ func (r *PazSalvoGradoORM) Listar(estadoDocumentacionAprobadaID int, tiposEspera
 			resultado.Solicitudes = append(resultado.Solicitudes, *expediente)
 		}
 		resultado.Total++
+	}
+	return resultado, nil
+}
+
+func (r *PazSalvoGradoORM) ListarAprobadosSecretaria(estadoDocumentacionAprobadaID, tipoSecretariaID, estadoAprobadoID int,
+	dependencias []int, periodoID, limit, offset int) (*models.PaginaAprobadosSecretariaGrado, error) {
+	o := orm.NewOrm()
+	// El filtro usa el último estado activo del check de Secretaría y de la
+	// solicitud, de modo que Total y cada página incluyan solo aprobaciones vigentes.
+	filtro := ` FROM paz_y_salvos.solicitud_grado s
+		JOIN paz_y_salvos.paz_salvo ps ON ps.solicitud_grado_id=s.id AND ps.activo=true AND ps.tipo_paz_salvo_id=?
+		JOIN LATERAL (
+			SELECT h.estado_paz_salvo_id, h.fecha_creacion
+			FROM paz_y_salvos.historial_paz_salvo h
+			WHERE h.paz_salvo_id=ps.id AND h.activo=true
+			ORDER BY h.fecha_creacion DESC, h.id DESC LIMIT 1
+		) hp ON hp.estado_paz_salvo_id=?
+		JOIN LATERAL (
+			SELECT h.estado_solicitud_id FROM paz_y_salvos.historial_solicitud_grado h
+			WHERE h.solicitud_grado_id=s.id AND h.activo=true
+			ORDER BY h.fecha_creacion DESC, h.id DESC LIMIT 1
+		) hs ON hs.estado_solicitud_id=?
+		WHERE s.activo=true AND s.periodo_id=?`
+	args := []interface{}{tipoSecretariaID, estadoAprobadoID, estadoDocumentacionAprobadaID, periodoID}
+	if len(dependencias) > 0 {
+		marcadores := make([]string, len(dependencias))
+		for i, dependencia := range dependencias {
+			marcadores[i] = "?"
+			args = append(args, dependencia)
+		}
+		filtro += " AND s.dependencia_oikos_id IN (" + strings.Join(marcadores, ",") + ")"
+	}
+	resultado := &models.PaginaAprobadosSecretariaGrado{Solicitudes: []models.SolicitudAprobadaSecretariaGrado{}}
+	if err := o.Raw("SELECT COUNT(*)"+filtro, args...).QueryRow(&resultado.Total); err != nil {
+		return nil, err
+	}
+	if offset >= resultado.Total {
+		return resultado, nil
+	}
+	consulta := `SELECT s.id AS solicitud_id, s.tercero_id, s.codigo_estudiante, s.periodo_id,
+		s.programa_academico_id, s.dependencia_oikos_id, hp.fecha_creacion AS fecha_aprobacion` + filtro +
+		` ORDER BY s.fecha_modificacion DESC, s.id DESC LIMIT ? OFFSET ?`
+	args = append(args, limit, offset)
+	if _, err := o.Raw(consulta, args...).QueryRows(&resultado.Solicitudes); err != nil {
+		return nil, err
 	}
 	return resultado, nil
 }

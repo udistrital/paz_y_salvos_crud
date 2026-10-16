@@ -24,6 +24,23 @@ type PazSalvoGradoListadoRepository interface {
 	Listar(estadoDocumentacionAprobadaID int, tiposEsperados, dependencias []int, limit, offset, periodoID, programaID, terceroID int, codigo string) (*models.PaginaPazSalvosGrado, error)
 }
 
+type AprobadosSecretariaGradoRepository interface {
+	ListarAprobadosSecretaria(estadoDocumentacionAprobadaID, tipoSecretariaID, estadoAprobadoID int,
+		dependencias []int, periodoID, limit, offset int) (*models.PaginaAprobadosSecretariaGrado, error)
+}
+
+func ListarAprobadosSecretariaGrado(repo AprobadosSecretariaGradoRepository,
+	estadoDocumentacionAprobadaID, tipoSecretariaID, estadoAprobadoID int,
+	dependencias []int, periodoID, limit, offset int) (*models.PaginaAprobadosSecretariaGrado, error) {
+	if repo == nil || estadoDocumentacionAprobadaID <= 0 || tipoSecretariaID <= 0 || estadoAprobadoID <= 0 ||
+		(len(dependencias) > 0 && !idsRevisionValidos(dependencias, len(dependencias))) ||
+		periodoID <= 0 || limit <= 0 || limit > 100 || offset < 0 {
+		return nil, ErrPazSalvoGradoInvalido
+	}
+	return repo.ListarAprobadosSecretaria(estadoDocumentacionAprobadaID, tipoSecretariaID, estadoAprobadoID,
+		dependencias, periodoID, limit, offset)
+}
+
 func tiposPazSalvoValidos(entrada models.DecidirPazSalvoGrado) bool {
 	if len(entrada.TiposPreviosId) != 7 || entrada.TipoSecretariaId <= 0 {
 		return false
@@ -57,8 +74,9 @@ func validarDecisionPazSalvo(entrada *models.DecidirPazSalvoGrado) error {
 		return fmt.Errorf("%w: estado no permitido", ErrPazSalvoGradoInvalido)
 	}
 	if utf8.RuneCountInString(entrada.Justificacion) > 500 ||
-		((entrada.EstadoPazSalvoId == entrada.EstadoPendienteId || entrada.EstadoPazSalvoId == entrada.EstadoDesaprobadoId) && entrada.Justificacion == "") {
-		return fmt.Errorf("%w: reabrir o desaprobar requiere una justificación válida", ErrPazSalvoGradoInvalido)
+		((entrada.EstadoPazSalvoId == entrada.EstadoPendienteId || entrada.EstadoPazSalvoId == entrada.EstadoDesaprobadoId ||
+			entrada.TipoPazSalvoId == entrada.TipoSecretariaId) && entrada.Justificacion == "") {
+		return fmt.Errorf("%w: la decisión requiere una justificación válida", ErrPazSalvoGradoInvalido)
 	}
 	return nil
 }

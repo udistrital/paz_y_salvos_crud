@@ -276,6 +276,39 @@ func (c *InscripcionGradoController) ListarPazSalvos() {
 	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Bandeja de Paz y Salvos", Data: resultado})
 }
 
+// ListarAprobadosSecretaria recibe los IDs de catálogo resueltos por el MID y
+// consulta los programas del periodo indicado. El CRUD es una ruta interna.
+func (c *InscripcionGradoController) ListarAprobadosSecretaria() {
+	periodo, errPeriodo := c.GetInt("periodo_id")
+	limit, errLimit := c.GetInt("limit", 20)
+	offset, errOffset := c.GetInt("offset", 0)
+	estadoDocumental, errDocumental := c.GetInt("estado_documentacion_aprobada_id")
+	tipoSecretaria, errTipo := c.GetInt("tipo_secretaria_id")
+	estadoAprobado, errAprobado := c.GetInt("estado_aprobado_id")
+	var dependencias []int
+	var errDependencias error
+	if strings.TrimSpace(c.GetString("dependencias")) != "" {
+		dependencias, errDependencias = idsConsultaRevision(c.GetString("dependencias"))
+	}
+	if errPeriodo != nil || errLimit != nil || errOffset != nil || errDocumental != nil ||
+		errTipo != nil || errAprobado != nil || errDependencias != nil {
+		helpers.RenderError(&c.Controller, http.StatusBadRequest, "Filtros de aprobados inválidos")
+		return
+	}
+	resultado, err := services.ListarAprobadosSecretariaGrado(repositories.NuevoPazSalvoGradoORM(),
+		estadoDocumental, tipoSecretaria, estadoAprobado, dependencias, periodo, limit, offset)
+	if err != nil {
+		if errors.Is(err, services.ErrPazSalvoGradoInvalido) {
+			helpers.RenderError(&c.Controller, http.StatusBadRequest, "Filtros de aprobados inválidos")
+			return
+		}
+		helpers.RenderError(&c.Controller, http.StatusInternalServerError, "No se pudo consultar los aprobados")
+		return
+	}
+	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK,
+		Message: "Paz y Salvos aprobados por Secretaría", Data: resultado})
+}
+
 func (c *InscripcionGradoController) DecidirPazSalvo() {
 	id, errID := strconv.Atoi(c.Ctx.Input.Param(":id"))
 	if errID != nil {
