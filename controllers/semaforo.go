@@ -15,12 +15,12 @@ import (
 	beego "github.com/beego/beego/v2/server/web"
 )
 
-// SemaforoController operations for Semaforo
+// SemaforoController administra los registros del semáforo académico.
 type SemaforoController struct {
 	beego.Controller
 }
 
-// URLMapping ...
+// URLMapping vincula las operaciones del semáforo con los métodos HTTP.
 func (c *SemaforoController) URLMapping() {
 	c.Mapping("Post", c.Post)
 	c.Mapping("GetOne", c.GetOne)
@@ -30,9 +30,9 @@ func (c *SemaforoController) URLMapping() {
 	c.Mapping("Patch", c.Patch)
 }
 
-// Post ...
+// Post crea un registro de semáforo a partir del cuerpo JSON.
 // @Title Post
-// @Description create Semaforo
+// @Description Crea un registro del semáforo
 // @Param	body		body 	models.Semaforo	true		"body for Semaforo content"
 // @Success 201 {object} models.APIResponse
 // @Failure 400 {object} models.APIResponse
@@ -54,10 +54,10 @@ func (c *SemaforoController) Post() {
 	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusCreated, Message: "Registro creado correctamente", Data: v})
 }
 
-// GetOne ...
+// GetOne consulta un registro de semáforo por ID.
 // @Title Get One
-// @Description get Semaforo by id
-// @Param	id		path 	string	true		"The key for staticblock"
+// @Description Consulta un registro del semáforo por ID
+// @Param	id		path 	string	true		"ID del semáforo"
 // @Success 200 {object} models.APIResponse
 // @Failure 400 {object} models.APIResponse
 // @Failure 404 {object} models.APIResponse
@@ -81,15 +81,15 @@ func (c *SemaforoController) GetOne() {
 	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Consulta exitosa", Data: v})
 }
 
-// GetAll ...
+// GetAll lista registros de semáforo con filtros, orden y paginación.
 // @Title Get All
-// @Description get Semaforo
-// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
-// @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
-// @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
-// @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
-// @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
-// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
+// @Description Lista registros del semáforo con filtros opcionales
+// @Param	query	query	string	false	"Filtros por campo en formato campo:valor"
+// @Param	fields	query	string	false	"Campos incluidos en la respuesta, separados por coma"
+// @Param	sortby	query	string	false	"Campos por los que se ordenan los resultados"
+// @Param	order	query	string	false	"Dirección asc o desc por campo, o una sola para todos"
+// @Param	limit	query	string	false	"Cantidad máxima de registros por página"
+// @Param	offset	query	string	false	"Registros omitidos al inicio de la página"
 // @Success 200 {object} models.APIResponse
 // @Failure 400 {object} models.APIResponse
 // @Failure 404 {object} models.APIResponse
@@ -145,9 +145,9 @@ func (c *SemaforoController) GetAll() {
 	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Consulta exitosa", Data: l})
 }
 
-// Put ...
+// Put reemplaza un registro del semáforo por ID y devuelve los datos persistidos.
 // @Title Put
-// @Description update the Semaforo
+// @Description Actualiza un registro del semáforo
 // @Param	id		path 	string	true		"The id you want to update"
 // @Param	body		body 	models.Semaforo	true		"body for Semaforo content"
 // @Success 200 {object} models.APIResponse
@@ -169,7 +169,7 @@ func (c *SemaforoController) Put() {
 		helpers.RenderError(&c.Controller, http.StatusBadRequest, "La solicitud contiene un tipo de dato incorrecto o un parámetro inválido")
 		return
 	}
-	v.Id = id // Asegura que el id es el correcto
+	v.Id = id // El ID de la ruta prevalece sobre el ID recibido en el cuerpo.
 
 	if err := models.UpdateSemaforoById(&v); err != nil {
 		logs.Error(err)
@@ -187,9 +187,9 @@ func (c *SemaforoController) Put() {
 	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Registro actualizado correctamente", Data: updated})
 }
 
-// Delete ...
+// Delete elimina el registro del semáforo indicado por ID.
 // @Title Delete
-// @Description delete the Semaforo
+// @Description Elimina un registro del semáforo
 // @Param	id		path 	string	true		"The id you want to delete"
 // @Success 200 {object} models.APIResponse
 // @Failure 400 {object} models.APIResponse
@@ -214,9 +214,9 @@ func (c *SemaforoController) Delete() {
 	helpers.RenderResponse(&c.Controller, models.APIResponse{Success: true, Status: http.StatusOK, Message: "Registro eliminado correctamente", Data: data})
 }
 
-// Patch ...
+// Patch aplica una actualización parcial y valida las reglas del semáforo.
 // @Title Patch
-// @Description update partial fields of Semaforo
+// @Description Actualiza campos del semáforo y valida las reglas del negocio
 // @Param   id      path    string                 true        "The id you want to patch"
 // @Param   body    body    models.SemaforoPatch true        "Fields to update"
 // @Success 200 {object} models.APIResponse
@@ -246,7 +246,7 @@ func (c *SemaforoController) Patch() {
 		logs.Error(err)
 		errorMsg := err.Error()
 
-		// Si es un error de validación de reglas de negocio, retornar 409 Conflict
+		// Los conflictos de estado, dependencia y actividad reciben HTTP 409.
 		if strings.Contains(errorMsg, "ORC") ||
 			strings.Contains(errorMsg, "dependencias") ||
 			strings.Contains(errorMsg, "activo") {
@@ -254,7 +254,7 @@ func (c *SemaforoController) Patch() {
 			return
 		}
 
-		// Para otros errores, retornar 400
+		// Las demás entradas inválidas reciben HTTP 400.
 		helpers.RenderError(&c.Controller, http.StatusBadRequest, "No se pudo actualizar parcialmente el semáforo con los datos enviados")
 		return
 	}

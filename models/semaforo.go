@@ -46,8 +46,7 @@ func init() {
 	orm.RegisterModel(new(Semaforo))
 }
 
-// AddSemaforo insert a new Semaforo into database and returns
-// last inserted Id on success.
+// AddSemaforo crea el registro con fechas de Bogotá y devuelve su ID.
 func AddSemaforo(m *Semaforo) (id int64, err error) {
 	o := orm.NewOrm()
 	ahora := utils.HoraBogota()
@@ -57,8 +56,7 @@ func AddSemaforo(m *Semaforo) (id int64, err error) {
 	return
 }
 
-// GetSemaforoById retrieves Semaforo by Id. Returns error if
-// Id doesn't exist
+// GetSemaforoById obtiene el registro por ID o devuelve el error de consulta.
 func GetSemaforoById(id int) (v *Semaforo, err error) {
 	o := orm.NewOrm()
 	v = &Semaforo{Id: id}
@@ -68,8 +66,7 @@ func GetSemaforoById(id int) (v *Semaforo, err error) {
 	return nil, err
 }
 
-// GetAllSemaforo retrieves all Semaforo matches certain condition. Returns empty list if
-// no records exist
+// GetAllSemaforo aplica filtros, selección de campos, orden y paginación a los registros.
 func GetAllSemaforo(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (result interface{}, err error) {
 
@@ -100,7 +97,7 @@ func GetAllSemaforo(query map[string]string, fields []string, sortby []string, o
 
 	qs = qs.SetCond(cond)
 
-	// order by
+	// Valida la dirección del orden solicitado para cada campo.
 	var sortFields []string
 	if len(sortby) != 0 {
 		if len(sortby) == len(order) {
@@ -150,12 +147,11 @@ func GetAllSemaforo(query map[string]string, fields []string, sortby []string, o
 	return nil, err
 }
 
-// UpdateSemaforo updates Semaforo by Id and returns error if
-// the record to be updated doesn't exist
+// UpdateSemaforoById conserva la fecha de creación y actualiza el registro y su modificación.
 func UpdateSemaforoById(m *Semaforo) (err error) {
 	o := orm.NewOrm()
 	v := Semaforo{Id: m.Id}
-	// ascertain id exists in the database
+	// Consulta el registro para verificar su existencia y conservar la fecha de creación.
 	if err = o.Read(&v); err == nil {
 		m.FechaCreacion = v.FechaCreacion
 		m.FechaModificacion = utils.HoraBogota()
@@ -167,12 +163,11 @@ func UpdateSemaforoById(m *Semaforo) (err error) {
 	return
 }
 
-// DeleteSemaforo deletes Semaforo by Id and returns error if
-// the record to be deleted doesn't exist
+// DeleteSemaforo elimina físicamente el registro identificado por ID.
 func DeleteSemaforo(id int) (err error) {
 	o := orm.NewOrm()
 	v := Semaforo{Id: id}
-	// ascertain id exists in the database
+	// Comprueba que el registro exista antes de eliminarlo.
 	if err = o.Read(&v); err == nil {
 		var num int64
 		if num, err = o.Delete(&Semaforo{Id: id}); err == nil {

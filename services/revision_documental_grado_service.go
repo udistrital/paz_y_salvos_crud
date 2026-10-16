@@ -55,7 +55,7 @@ func validarRevisionDocumental(entrada *models.RevisarDocumentacionGrado) error 
 		entrada.EstadoObservadaId <= 0 || entrada.EstadoDocumentacionAprobadaId <= 0 ||
 		entrada.EstadoSoporteObservadoId <= 0 || entrada.EstadoSoporteAprobadoId <= 0 ||
 		entrada.EstadoObservadaId == entrada.EstadoDocumentacionAprobadaId ||
-		entrada.EstadoSoporteObservadoId == entrada.EstadoSoporteAprobadoId || len(entrada.Soportes) < 3 || len(entrada.Soportes) > 4 ||
+		entrada.EstadoSoporteObservadoId == entrada.EstadoSoporteAprobadoId || len(entrada.Soportes) == 0 ||
 		!idsRevisionValidos(idsSoportesRevision(entrada.Soportes), len(entrada.Soportes)) {
 		return ErrRevisionDocumentalInvalida
 	}
