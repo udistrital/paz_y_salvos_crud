@@ -1,17 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "beego Test API",
-        "description": "beego has a very cool tools to autogenerate documents for your API",
-        "version": "1.0.0",
-        "termsOfService": "http://beego.me/",
-        "contact": {
-            "email": "astaxie@gmail.com"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        }
+        "title": "Paz y Salvos CRUD",
+        "description": "Persistencia interna de solicitudes, revisiones y checks de Grados",
+        "version": "1.0.0"
     },
     "basePath": "/v1",
     "paths": {
@@ -64,20 +56,20 @@
                     "200": {
                         "description": "",
                         "schema": {
-							"$ref": "#/definitions/models.APIResponse"
+                            "$ref": "#/definitions/models.APIResponse"
                         }
                     },
-					"400": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
-					},
-					"404": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
                     }
                 }
             },
@@ -100,16 +92,16 @@
                 ],
                 "responses": {
                     "201": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
                     },
-					"400": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
                     }
                 }
             }
@@ -134,20 +126,20 @@
                     "200": {
                         "description": "",
                         "schema": {
-							"$ref": "#/definitions/models.APIResponse"
+                            "$ref": "#/definitions/models.APIResponse"
                         }
                     },
-					"400": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
-					},
-					"404": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
                     }
                 }
             },
@@ -179,20 +171,20 @@
                     "200": {
                         "description": "",
                         "schema": {
-							"$ref": "#/definitions/models.APIResponse"
+                            "$ref": "#/definitions/models.APIResponse"
                         }
                     },
-					"400": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
-					},
-					"404": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
                     }
                 }
             },
@@ -213,22 +205,22 @@
                 ],
                 "responses": {
                     "200": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
                     },
-					"400": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
-					},
-					"404": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
+                    "400": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
                     }
                 }
             },
@@ -260,71 +252,1400 @@
                     "200": {
                         "description": "",
                         "schema": {
-							"$ref": "#/definitions/models.APIResponse"
+                            "$ref": "#/definitions/models.APIResponse"
                         }
                     },
                     "400": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
-					},
-					"404": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
-					},
-					"409": {
-						"description": "",
-						"schema": {
-							"$ref": "#/definitions/models.APIResponse"
-						}
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.APIResponse"
+                        }
                     }
                 }
+            }
+        },
+        "/solicitud-grado/{id}/versiones": {
+            "get": {
+                "tags": [
+                    "versiones-grado-interno"
+                ],
+                "summary": "Lista las entregas radicadas del ámbito resuelto por el MID.",
+                "description": "Lista las entregas radicadas del ámbito resuelto por el MID.",
+                "operationId": "InscripcionGradoController.ListarVersiones",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Indicar exactamente uno entre tercero_id y dependencia_id"
+                    },
+                    {
+                        "in": "query",
+                        "name": "dependencia_id",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/grado.ResumenVersion"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                }
+            }
+        },
+        "/solicitud-grado/{id}/versiones/{numero}": {
+            "get": {
+                "tags": [
+                    "versiones-grado-interno"
+                ],
+                "summary": "Consulta el formulario, soportes y actuaciones de una entrega radicada.",
+                "description": "Consulta el formulario, soportes y actuaciones de una entrega radicada.",
+                "operationId": "InscripcionGradoController.ConsultarVersion",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "path",
+                        "name": "numero",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Indicar exactamente uno entre tercero_id y dependencia_id"
+                    },
+                    {
+                        "in": "query",
+                        "name": "dependencia_id",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.DetalleVersion"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                }
+            }
+        },
+        "/solicitud-grado/paz-salvos/aprobados": {
+            "get": {
+                "tags": [
+                    "diplomas-interno"
+                ],
+                "summary": "Filtra el último check de Secretaría aprobado antes de paginar.",
+                "description": "Filtra el último check de Secretaría aprobado antes de paginar.",
+                "operationId": "InscripcionGradoController.ListarAprobadosSecretaria",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "periodo_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tipo_secretaria_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estado_documentacion_aprobada_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estado_aprobado_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "$ref": "#/definitions/grado.RespuestaAprobados"
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    }
+                }
+            }
+        },
+        "/solicitud-grado/paz-salvos": {
+            "get": {
+                "tags": [
+                    "paz-salvos-grado-interno"
+                ],
+                "summary": "Lista solicitudes y ocho checks con filtros de ámbito resueltos por el MID.",
+                "description": "Lista solicitudes y ocho checks con filtros de ámbito resueltos por el MID.",
+                "operationId": "InscripcionGradoController.ListarPazSalvos",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "estado_documentacion_aprobada_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tipos",
+                        "required": true,
+                        "type": "string",
+                        "description": "Ocho IDs de tipos separados por coma"
+                    },
+                    {
+                        "in": "query",
+                        "name": "dependencias",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "periodo_id",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "programa_id",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "codigo",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.PaginaPazSalvos"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    }
+                }
+            }
+        },
+        "/solicitud-grado/{id}/paz-salvos": {
+            "get": {
+                "tags": [
+                    "paz-salvos-grado-interno"
+                ],
+                "summary": "Consulta los ocho checks y sus actuaciones actuales.",
+                "description": "Consulta los ocho checks y sus actuaciones actuales.",
+                "operationId": "InscripcionGradoController.ConsultarPazSalvos",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estado_documentacion_aprobada_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tipos",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.PazSalvosSolicitud"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "paz-salvos-grado-interno"
+                ],
+                "summary": "Agrega la actuación del check validado por el MID.",
+                "description": "Agrega la actuación del check validado por el MID.",
+                "operationId": "InscripcionGradoController.DecidirPazSalvo",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/grado.DecisionCheckInterna"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.PazSalvosSolicitud"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                },
+                "consumes": [
+                    "application/json"
+                ]
+            }
+        },
+        "/solicitud-grado/revision": {
+            "get": {
+                "tags": [
+                    "revision-grado-interno"
+                ],
+                "summary": "Lista solicitudes de una dependencia autorizada.",
+                "description": "Lista solicitudes de una dependencia autorizada.",
+                "operationId": "InscripcionGradoController.ListarRevisionDocumental",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "dependencia_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estados",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "periodo_id",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "programa_id",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/grado.Borrador"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    }
+                }
+            }
+        },
+        "/solicitud-grado/revision/{id}": {
+            "get": {
+                "tags": [
+                    "revision-grado-interno"
+                ],
+                "summary": "Consulta la solicitud y documentos de una dependencia.",
+                "description": "Consulta la solicitud y documentos de una dependencia.",
+                "operationId": "InscripcionGradoController.ConsultarRevisionDocumental",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "query",
+                        "name": "dependencia_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estados",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "revision-grado-interno"
+                ],
+                "summary": "Registra revisión de soportes e inicia los checks al aprobar.",
+                "description": "Registra revisión de soportes e inicia los checks al aprobar.",
+                "operationId": "InscripcionGradoController.RevisarDocumentacion",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "query",
+                        "name": "dependencia_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/grado.RevisionInterna"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                },
+                "consumes": [
+                    "application/json"
+                ]
+            }
+        },
+        "/solicitud-grado/borrador/{id}/soportes/{tipo}": {
+            "put": {
+                "tags": [
+                    "inscripcion-grado-interno"
+                ],
+                "summary": "Asocia o reemplaza un documento de un borrador.",
+                "description": "Asocia o reemplaza un documento de un borrador.",
+                "operationId": "InscripcionGradoController.AsociarSoporte",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "path",
+                        "name": "tipo",
+                        "required": true,
+                        "type": "string",
+                        "description": "Código de soporte o check"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estado_borrador_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/grado.SoporteInterno"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                },
+                "consumes": [
+                    "application/json"
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "inscripcion-grado-interno"
+                ],
+                "summary": "Desactiva la asociación vigente de un soporte provisional.",
+                "description": "Desactiva la asociación vigente de un soporte provisional.",
+                "operationId": "InscripcionGradoController.EliminarSoporte",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "path",
+                        "name": "tipo",
+                        "required": true,
+                        "type": "string",
+                        "description": "Código de soporte o check"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estado_borrador_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "formulario_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "soporte_actual_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                }
+            }
+        },
+        "/solicitud-grado/borrador/{id}/radicar": {
+            "post": {
+                "tags": [
+                    "inscripcion-grado-interno"
+                ],
+                "summary": "Radica de forma transaccional formulario y soportes presentes.",
+                "description": "Radica de forma transaccional formulario y soportes presentes.",
+                "operationId": "InscripcionGradoController.Radicar",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/grado.RadicarInterno"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                },
+                "consumes": [
+                    "application/json"
+                ]
+            }
+        },
+        "/solicitud-grado/borrador/{id}/subsanar": {
+            "post": {
+                "tags": [
+                    "inscripcion-grado-interno"
+                ],
+                "summary": "Crea la siguiente versión editable con soportes heredados.",
+                "description": "Crea la siguiente versión editable con soportes heredados.",
+                "operationId": "InscripcionGradoController.Subsanar",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/grado.SubsanarInterno"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                },
+                "consumes": [
+                    "application/json"
+                ]
+            }
+        },
+        "/solicitud-grado/borrador": {
+            "post": {
+                "tags": [
+                    "inscripcion-grado-interno"
+                ],
+                "summary": "Crea solicitud, formulario e historial inicial.",
+                "description": "Crea solicitud, formulario e historial inicial.",
+                "operationId": "InscripcionGradoController.CrearBorrador",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/grado.CrearBorradorInterno"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    }
+                },
+                "consumes": [
+                    "application/json"
+                ]
+            },
+            "get": {
+                "tags": [
+                    "inscripcion-grado-interno"
+                ],
+                "summary": "Consulta la solicitud por propietario, periodo y programa.",
+                "description": "Consulta la solicitud por propietario, periodo y programa.",
+                "operationId": "InscripcionGradoController.ConsultarBorrador",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "periodo_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "programa_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estados",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    }
+                }
+            }
+        },
+        "/solicitud-grado/borrador/{id}": {
+            "get": {
+                "tags": [
+                    "inscripcion-grado-interno"
+                ],
+                "summary": "Consulta la solicitud por ID y propietario.",
+                "description": "Consulta la solicitud por ID y propietario.",
+                "operationId": "InscripcionGradoController.ConsultarBorradorPorID",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estados",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "inscripcion-grado-interno"
+                ],
+                "summary": "Actualiza el contenido del formulario editable.",
+                "description": "Actualiza el contenido del formulario editable.",
+                "operationId": "InscripcionGradoController.ActualizarBorrador",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "required": true,
+                        "type": "integer",
+                        "description": "Identificador de solicitud/entrega"
+                    },
+                    {
+                        "in": "query",
+                        "name": "tercero_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "estado_borrador_id",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/grado.GuardarBorrador"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Respuesta exitosa",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "Success": {
+                                    "type": "boolean"
+                                },
+                                "Status": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "Message": {
+                                    "type": "string"
+                                },
+                                "Data": {
+                                    "$ref": "#/definitions/grado.Borrador"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Solicitud o filtros inválidos"
+                    },
+                    "503": {
+                        "description": "Servicio institucional no disponible"
+                    },
+                    "404": {
+                        "description": "Solicitud o entrega no encontrada"
+                    },
+                    "409": {
+                        "description": "Estado o versión en conflicto"
+                    }
+                },
+                "consumes": [
+                    "application/json"
+                ]
             }
         }
     },
     "definitions": {
-		"models.SemaforoPatch": {
-			"title": "SemaforoPatch",
-			"type": "object",
-			"properties": {
-				"Academico": {"type": "boolean"},
-				"Financiero": {"type": "boolean"},
-				"Biblioteca": {"type": "boolean"},
-				"Laboratorios": {"type": "boolean"},
-				"Bienestar": {"type": "boolean"},
-				"Urelinter": {"type": "boolean"},
-				"Orc": {"type": "boolean", "x-nullable": true},
-				"ObservacionCoordinacion": {"type": "string"},
-				"ObservacionBiblioteca": {"type": "string"},
-				"ObservacionLaboratorios": {"type": "string"},
-				"ObservacionBienestar": {"type": "string"},
-				"ObservacionUrelinter": {"type": "string"},
-				"ObservacionOrc": {"type": "string"},
-				"ObservacionFinanciera": {"type": "string"}
-			}
-		},
-		"models.APIResponse": {
-			"title": "APIResponse",
-			"type": "object",
-			"properties": {
-				"Data": {
-					"type": "object"
-				},
-				"Message": {
-					"type": "object"
-				},
-				"Status": {
-					"type": "integer",
-					"format": "int64"
-				},
-				"Success": {
-					"type": "boolean"
-				}
-			}
-		},
+        "models.SemaforoPatch": {
+            "title": "SemaforoPatch",
+            "type": "object",
+            "properties": {
+                "Academico": {
+                    "type": "boolean"
+                },
+                "Financiero": {
+                    "type": "boolean"
+                },
+                "Biblioteca": {
+                    "type": "boolean"
+                },
+                "Laboratorios": {
+                    "type": "boolean"
+                },
+                "Bienestar": {
+                    "type": "boolean"
+                },
+                "Urelinter": {
+                    "type": "boolean"
+                },
+                "Orc": {
+                    "type": "boolean",
+                    "x-nullable": true
+                },
+                "ObservacionCoordinacion": {
+                    "type": "string"
+                },
+                "ObservacionBiblioteca": {
+                    "type": "string"
+                },
+                "ObservacionLaboratorios": {
+                    "type": "string"
+                },
+                "ObservacionBienestar": {
+                    "type": "string"
+                },
+                "ObservacionUrelinter": {
+                    "type": "string"
+                },
+                "ObservacionOrc": {
+                    "type": "string"
+                },
+                "ObservacionFinanciera": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.APIResponse": {
+            "title": "APIResponse",
+            "type": "object",
+            "properties": {
+                "Data": {
+                    "type": "object"
+                },
+                "Message": {
+                    "type": "object"
+                },
+                "Status": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "models.Semaforo": {
             "title": "Semaforo",
             "type": "object",
@@ -415,12 +1736,1229 @@
                     "type": "boolean"
                 }
             }
+        },
+        "grado.Respuesta": {
+            "type": "object",
+            "properties": {
+                "Success": {
+                    "type": "boolean"
+                },
+                "Status": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Message": {
+                    "type": "string"
+                },
+                "Data": {
+                    "type": "object",
+                    "description": "Contenido según la operación"
+                }
+            },
+            "required": [
+                "Success",
+                "Status"
+            ]
+        },
+        "grado.RespuestaAprobados": {
+            "type": "object",
+            "properties": {
+                "Success": {
+                    "type": "boolean"
+                },
+                "Status": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Message": {
+                    "type": "string"
+                },
+                "Data": {
+                    "$ref": "#/definitions/grado.PaginaAprobadosSecretaria"
+                }
+            },
+            "required": [
+                "Success",
+                "Status",
+                "Data"
+            ]
+        },
+        "grado.SolicitudAprobadaSecretaria": {
+            "type": "object",
+            "properties": {
+                "SolicitudId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CodigoEstudiante": {
+                    "type": "string"
+                },
+                "PeriodoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ProgramaAcademicoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DependenciaOikosId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "FechaAprobacion": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "grado.PaginaAprobadosSecretaria": {
+            "type": "object",
+            "properties": {
+                "Solicitudes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/grado.SolicitudAprobadaSecretaria"
+                    }
+                },
+                "Total": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "grado.Solicitud": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CodigoEstudiante": {
+                    "type": "string"
+                },
+                "PeriodoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ProgramaAcademicoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DependenciaOikosId": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "grado.Soporte": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TipoSoporte": {
+                    "type": "string"
+                },
+                "DocumentoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nombre": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.Formulario": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Version": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Contenido": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "FechaRadicacion": {
+                    "type": "string",
+                    "format": "date-time",
+                    "x-nullable": true
+                }
+            }
+        },
+        "grado.ResumenVersion": {
+            "type": "object",
+            "properties": {
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Version": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "FechaRadicacion": {
+                    "type": "string"
+                },
+                "EstadoSolicitudId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Justificacion": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.DetalleVersion": {
+            "type": "object",
+            "properties": {
+                "Solicitud": {
+                    "type": "object",
+                    "properties": {
+                        "Id": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "TerceroId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "CodigoEstudiante": {
+                            "type": "string"
+                        },
+                        "PeriodoId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "ProgramaAcademicoId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "DependenciaOikosId": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                },
+                "Formulario": {
+                    "type": "object",
+                    "properties": {
+                        "Id": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "Version": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "Contenido": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "FechaRadicacion": {
+                            "type": "string",
+                            "format": "date-time",
+                            "x-nullable": true
+                        }
+                    }
+                },
+                "Historial": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "Soportes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            }
+        },
+        "grado.Borrador": {
+            "type": "object",
+            "properties": {
+                "Solicitud": {
+                    "type": "object",
+                    "properties": {
+                        "Id": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "TerceroId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "CodigoEstudiante": {
+                            "type": "string"
+                        },
+                        "PeriodoId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "ProgramaAcademicoId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "DependenciaOikosId": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                },
+                "Formulario": {
+                    "type": "object",
+                    "properties": {
+                        "Id": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "Version": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "Contenido": {
+                            "type": "object",
+                            "additionalProperties": true
+                        },
+                        "FechaRadicacion": {
+                            "type": "string",
+                            "format": "date-time",
+                            "x-nullable": true
+                        }
+                    }
+                },
+                "Soportes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "Id": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "FormularioId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "TipoSoporte": {
+                                "type": "string"
+                            },
+                            "DocumentoId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "Nombre": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "Estado": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.Check": {
+            "type": "object",
+            "properties": {
+                "PazSalvo": {
+                    "type": "object",
+                    "properties": {
+                        "TipoCodigo": {
+                            "type": "string"
+                        },
+                        "TipoPazSalvoId": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                },
+                "EstadoActual": {
+                    "type": "object",
+                    "properties": {
+                        "EstadoCodigo": {
+                            "type": "string"
+                        },
+                        "Justificacion": {
+                            "type": "string"
+                        },
+                        "FechaCreacion": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "Historial": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "EstadoCodigo": {
+                                "type": "string"
+                            },
+                            "Justificacion": {
+                                "type": "string"
+                            },
+                            "FechaCreacion": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "grado.PazSalvosSolicitud": {
+            "type": "object",
+            "properties": {
+                "Solicitud": {
+                    "type": "object",
+                    "properties": {
+                        "Id": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "TerceroId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "CodigoEstudiante": {
+                            "type": "string"
+                        },
+                        "PeriodoId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "ProgramaAcademicoId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "DependenciaOikosId": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                },
+                "Checks": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "PazSalvo": {
+                                "type": "object",
+                                "properties": {
+                                    "TipoCodigo": {
+                                        "type": "string"
+                                    },
+                                    "TipoPazSalvoId": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                }
+                            },
+                            "EstadoActual": {
+                                "type": "object",
+                                "properties": {
+                                    "EstadoCodigo": {
+                                        "type": "string"
+                                    },
+                                    "Justificacion": {
+                                        "type": "string"
+                                    },
+                                    "FechaCreacion": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "Historial": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "EstadoCodigo": {
+                                            "type": "string"
+                                        },
+                                        "Justificacion": {
+                                            "type": "string"
+                                        },
+                                        "FechaCreacion": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "grado.PaginaPazSalvos": {
+            "type": "object",
+            "properties": {
+                "Solicitudes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/grado.PazSalvosSolicitud"
+                    }
+                },
+                "Total": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TipoGestionado": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.PaginaRevision": {
+            "type": "object",
+            "properties": {
+                "Solicitudes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/grado.SolicitudRevision"
+                    }
+                },
+                "Total": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "grado.ArchivoPDF": {
+            "type": "object",
+            "properties": {
+                "Nombre": {
+                    "type": "string"
+                },
+                "MimeType": {
+                    "type": "string",
+                    "enum": [
+                        "application/pdf"
+                    ]
+                },
+                "Archivo": {
+                    "type": "string",
+                    "format": "byte"
+                }
+            }
+        },
+        "grado.CrearBorrador": {
+            "type": "object",
+            "properties": {
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "PeriodoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ProgramaAcademicoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Contenido": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            },
+            "required": [
+                "TerceroId",
+                "PeriodoId",
+                "ProgramaAcademicoId",
+                "Contenido"
+            ]
+        },
+        "grado.GuardarBorrador": {
+            "type": "object",
+            "properties": {
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Contenido": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            },
+            "required": [
+                "TerceroId",
+                "Contenido"
+            ]
+        },
+        "grado.CargarSoporte": {
+            "type": "object",
+            "properties": {
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "SoporteActualId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nombre": {
+                    "type": "string"
+                },
+                "MimeType": {
+                    "type": "string"
+                },
+                "Archivo": {
+                    "type": "string",
+                    "format": "byte"
+                }
+            },
+            "required": [
+                "TerceroId",
+                "FormularioId",
+                "Nombre",
+                "MimeType",
+                "Archivo"
+            ]
+        },
+        "grado.Radicar": {
+            "type": "object",
+            "properties": {
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Contenido": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            },
+            "required": [
+                "TerceroId",
+                "FormularioId",
+                "Contenido"
+            ]
+        },
+        "grado.Subsanar": {
+            "type": "object",
+            "properties": {
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            },
+            "required": [
+                "TerceroId",
+                "FormularioId"
+            ]
+        },
+        "grado.DecisionSoporte": {
+            "type": "object",
+            "properties": {
+                "SoporteId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Observado": {
+                    "type": "boolean"
+                },
+                "Observacion": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.RevisarDocumentacion": {
+            "type": "object",
+            "properties": {
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Aprobada": {
+                    "type": "boolean"
+                },
+                "Justificacion": {
+                    "type": "string"
+                },
+                "Soportes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/grado.DecisionSoporte"
+                    }
+                }
+            },
+            "required": [
+                "FormularioId",
+                "Aprobada",
+                "Soportes"
+            ]
+        },
+        "grado.DecidirCheck": {
+            "type": "object",
+            "properties": {
+                "Estado": {
+                    "type": "string",
+                    "enum": [
+                        "PS_PENDIENTE",
+                        "PS_APROBADO",
+                        "PS_DESAPROBADO"
+                    ]
+                },
+                "Justificacion": {
+                    "type": "string"
+                },
+                "Perfil": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Estado",
+                "Perfil"
+            ]
+        },
+        "grado.SoporteInterno": {
+            "type": "object",
+            "properties": {
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "SoporteActualId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DocumentoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoSoporteId": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "grado.CrearBorradorInterno": {
+            "type": "object",
+            "properties": {
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CodigoEstudiante": {
+                    "type": "string"
+                },
+                "PeriodoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ProgramaAcademicoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DependenciaOikosId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CalendarioEventoInscripcionId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "CalendarioEventoAprobacionId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoBorradorId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Contenido": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "grado.RadicarInterno": {
+            "type": "object",
+            "properties": {
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Contenido": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "EstadoBorradorId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoRadicadaId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoSoportePendienteId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TiposSoporteId": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            }
+        },
+        "grado.SubsanarInterno": {
+            "type": "object",
+            "properties": {
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoObservadaId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoBorradorId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoSoportePendienteId": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "grado.DecisionSoporteInterna": {
+            "type": "object",
+            "properties": {
+                "SoporteId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoSoporteId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Observacion": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.RevisionInterna": {
+            "type": "object",
+            "properties": {
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Aprobada": {
+                    "type": "boolean"
+                },
+                "Justificacion": {
+                    "type": "string"
+                },
+                "EstadoRadicadaId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoObservadaId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoDocumentacionAprobadaId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoSoporteObservadoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoSoporteAprobadoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoPazSalvoPendienteId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TiposPazSalvoId": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "Soportes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/grado.DecisionSoporteInterna"
+                    }
+                }
+            }
+        },
+        "grado.DecisionCheckInterna": {
+            "type": "object",
+            "properties": {
+                "TerceroId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TipoPazSalvoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoPazSalvoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Justificacion": {
+                    "type": "string"
+                },
+                "EstadoDocumentacionAprobadaId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoPendienteId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoAprobadoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "EstadoDesaprobadoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TipoSecretariaId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TiposPreviosId": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                }
+            }
+        },
+        "grado.SoporteEliminado": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "FormularioId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "TipoSoporte": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.Director": {
+            "type": "object",
+            "properties": {
+                "DIR_NRO_IDEN": {
+                    "type": "string"
+                },
+                "DIR_NOMBRE": {
+                    "type": "string"
+                },
+                "DIR_APELLIDO": {
+                    "type": "string"
+                },
+                "DIR_ESTADO": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.Modalidad": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nombre": {
+                    "type": "string"
+                },
+                "CodigoAbreviacion": {
+                    "type": "string"
+                },
+                "Activo": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "grado.OpcionFiltro": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nombre": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.Pais": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nombre": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.Departamento": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nombre": {
+                    "type": "string"
+                },
+                "PaisId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "PaisNombre": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.Lugar": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Nombre": {
+                    "type": "string"
+                },
+                "DepartamentoId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "DepartamentoNombre": {
+                    "type": "string"
+                },
+                "PaisId": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "PaisNombre": {
+                    "type": "string"
+                }
+            }
+        },
+        "grado.LugarIdentificacion": {
+            "type": "object",
+            "properties": {
+                "Registrado": {
+                    "type": "boolean"
+                },
+                "Lugar": {
+                    "$ref": "#/definitions/grado.Lugar"
+                }
+            }
+        },
+        "grado.FiltrosRevision": {
+            "type": "object",
+            "properties": {
+                "Periodos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/grado.OpcionFiltro"
+                    }
+                },
+                "Programas": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            }
+        },
+        "grado.FiltrosPazSalvos": {
+            "type": "object",
+            "properties": {
+                "Periodos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/grado.OpcionFiltro"
+                    }
+                },
+                "Facultades": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/grado.OpcionFiltro"
+                    }
+                },
+                "Programas": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            }
+        },
+        "grado.UsuarioPazSalvos": {
+            "type": "object",
+            "properties": {
+                "NombreCompleto": {
+                    "type": "string"
+                },
+                "Facultad": {
+                    "$ref": "#/definitions/grado.OpcionFiltro"
+                }
+            }
+        },
+        "grado.SolicitudRevision": {
+            "type": "object",
+            "properties": {
+                "Solicitud": {
+                    "type": "object",
+                    "properties": {
+                        "Id": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "TerceroId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "CodigoEstudiante": {
+                            "type": "string"
+                        },
+                        "PeriodoId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "ProgramaAcademicoId": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "DependenciaOikosId": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                },
+                "Estudiante": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "Formulario": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "Estado": {
+                    "type": "string"
+                },
+                "Version": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Soportes": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "Id": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "FormularioId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "TipoSoporte": {
+                                "type": "string"
+                            },
+                            "DocumentoId": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "Nombre": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "tags": [
         {
+            "name": "diplomas-interno",
+            "description": "Operaciones de Grados"
+        },
+        {
+            "name": "inscripcion-grado-interno",
+            "description": "Operaciones de Grados"
+        },
+        {
+            "name": "paz-salvos-grado-interno",
+            "description": "Operaciones de Grados"
+        },
+        {
+            "name": "revision-grado-interno",
+            "description": "Operaciones de Grados"
+        },
+        {
             "name": "semaforo",
-            "description": "SemaforoController operations for Semaforo\n"
+            "description": "Semáforo institucional"
+        },
+        {
+            "name": "versiones-grado-interno",
+            "description": "Operaciones de Grados"
         }
     ]
 }

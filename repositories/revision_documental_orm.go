@@ -151,7 +151,7 @@ func (r *RevisionDocumentalORM) Guardar(id, dependenciaID, estadoSolicitudID int
 		return nil, err
 	}
 	if resultado.Formulario.Id != entrada.FormularioId || resultado.Formulario.FechaRadicacion == nil ||
-		len(resultado.Soportes) != len(entrada.Soportes) || len(resultado.Soportes) < 3 || len(resultado.Soportes) > 4 {
+		len(resultado.Soportes) == 0 || len(resultado.Soportes) != len(entrada.Soportes) {
 		return nil, services.ErrRevisionDocumentalInvalida
 	}
 	decisiones := make(map[int]models.DecisionSoporteGrado, len(entrada.Soportes))
